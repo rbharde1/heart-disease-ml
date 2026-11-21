@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Heart Disease Prediction Report</title>
+<link rel="stylesheet" href="style.css">
+<script>
+  MathJax = {
+    tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']] },
+    svg: { fontCache: 'global', scale: 0.92 }
+  };
+</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-svg.js"></script>
+</head>
+<body>
+
+<!-- ======================= COVER PAGE ======================= -->
+<section class="cover">
+  <hr class="rule">
+  <h1>Predicting Heart Disease Across Four Hospitals:<br>Logistic Regression, Support Vector Machines and<br>Random Forests on the UCI Heart Disease Data</h1>
+  <hr class="rule thin">
+  <div class="author" id="author">Rohan B</div>
+  <div class="affil">College of Computing and Informatics<br>University of North Carolina at Charlotte<br>Charlotte, NC 28223</div>
+  <div class="meta">Machine Learning &mdash; Course Project Report<br>November 2026</div>
+</section>
+
+<!-- ======================= ABSTRACT ======================= -->
+<div class="abstract">
+  <h2>Abstract</h2>
+  <p>Cardiovascular disease is the leading cause of death worldwide, and a model that estimates a patient's probability of coronary artery disease from routine clinical measurements could help decide who needs invasive angiography. I predict angiographically confirmed heart disease from 13 clinical attributes using <em>all four</em> hospitals of the UCI Heart Disease data (920 patients from Cleveland, Hungary, Switzerland and Long Beach VA) instead of the usual 303-patient Cleveland subset. Pooling the hospitals makes the problem harder: 16% of values are missing in strongly hospital-specific patterns, and disease prevalence ranges from 36% to 94% between sites. I build a leakage-free preprocessing pipeline (median/mode imputation with missing-value indicators, one-hot encoding and standardisation) and compare three tuned classifiers: L2-regularised logistic regression, an RBF-kernel support vector machine and a random forest. On a held-out test set of 184 patients all three reach a ROC-AUC of 0.90&ndash;0.91 and an accuracy of 0.84&ndash;0.85 (majority baseline: 0.55). The differences between them are not statistically significant. Supporting experiments show that performance is limited by the information in the features rather than by model capacity, that missingness acts largely as a fingerprint of the hospital, and that a random train/test split overstates performance at an unseen hospital (per-hospital AUC falls by 0.06&ndash;0.09 on the three hospitals with enough healthy patients to measure it).</p>
+</div>
+
+<!-- ======================= 1 INTRODUCTION ======================= -->
+<h2 id="sec-intro">1&nbsp;&nbsp;Introduction</h2>
+
+<h3>1.1&nbsp;&nbsp;Problem Statement</h3>
+<p>Given 13 clinical attributes that may be collected when a patient is evaluated for chest pain (age and sex, chest-pain type, resting blood pressure and cholesterol, fasting blood sugar, resting ECG, exercise-test results, and fluoroscopy and thallium-scan findings), the task is to predict whether coronary angiography would show a diameter narrowing of more than 50% in at least one major vessel. This is a <b>binary classification</b> problem: label 1 means heart disease is present and label 0 means it is absent. I use the four patient cohorts of the UCI Heart Disease repository [1, 2] together, so the model has to work for patients from different hospitals and countries, not only for the Cleveland Clinic patients that most previous work has studied.</p>
+
+<h3>1.2&nbsp;&nbsp;Motivation and Challenges</h3>
+<p><b>Why it matters.</b> Cardiovascular diseases caused an estimated 19.8 million deaths in 2022, about 32% of all deaths worldwide [3]. Coronary angiography is the reference test for coronary artery disease, but it is invasive, expensive and carries a small risk of complications. A model that turns cheap, non-invasive measurements into a well-calibrated probability of disease could help triage patients: refer high-probability patients to angiography quickly, and spare low-probability patients an unnecessary procedure. Because a missed diagnosis is much worse than an extra test, such a model has to be judged on more than accuracy: sensitivity, calibration and behaviour on new hospitals matter as much.</p>
+<p><b>Challenges.</b> Pooling the four hospitals creates the main difficulties of this project:</p>
+<ul>
+  <li><b>Heavy, structured missing data.</b> 16.2% of all feature values are missing, and the gaps depend on the hospital. For example, the number of coloured vessels (<code>ca</code>) is missing for 96&ndash;99% of non-Cleveland patients, and cholesterol is never recorded in Switzerland (it is stored as a fake value of 0 there). Deleting incomplete rows would discard 68% of the data and almost every non-Cleveland patient.</li>
+  <li><b>Hospital heterogeneity.</b> Disease prevalence is 45.9% in Cleveland, 36.1% in Hungary, 74.5% in Long Beach VA and 93.5% in Switzerland, and the patient populations differ in age, sex and test results. A model can exploit hospital-specific shortcuts [13, 14] that do not transfer to a new hospital.</li>
+  <li><b>Small sample size.</b> With 920 patients, every performance estimate has a wide confidence interval, and differences of 1&ndash;2 points between models can be pure noise. Careful validation and statistical testing are needed.</li>
+  <li><b>Asymmetric error costs and mixed feature types.</b> False negatives are more costly than false positives, so the default 0.5 threshold is not automatically the right operating point. The features are a mix of continuous, binary and nominal variables.</li>
+</ul>
+
+<h3>1.3&nbsp;&nbsp;Concise Summary of My Approach</h3>
+<p>I first explore the data visually and statistically, paying particular attention to <em>where</em> values are missing. I then build a preprocessing pipeline that imputes missing values, adds missing-value indicators, one-hot encodes nominal features and standardises numeric ones. Every step is fitted inside a scikit-learn <code>Pipeline</code>, so no information leaks from validation or test data. I compare three algorithms that represent different inductive biases: <b>logistic regression</b> (linear and interpretable, the classical clinical model), an <b>RBF-kernel SVM</b> (non-linear, maximum-margin) and a <b>random forest</b> (an ensemble of trees that captures interactions). Each is tuned by grid search with stratified 5-fold cross-validation (CV) on 80% of the data. Each is then evaluated on a held-out 20% test set, with bootstrap confidence intervals and paired significance tests.</p>
+<p>This design makes sense for the challenges above. ROC-AUC is threshold-free and insensitive to prevalence, so it is a sound tuning criterion when sites differ in base rate. Stratifying the split on hospital &times; diagnosis keeps both distributions nearly identical in training and test. The missing-indicator strategy keeps every patient, and the three model families tell us whether non-linearity actually helps. Finally, I run targeted experiments to <em>explain</em> the results rather than just report them: a preprocessing ablation, learning and validation curves, leave-one-hospital-out validation, a test of whether missingness encodes the hospital, feature importance, decision-threshold selection, calibration and error analysis.</p>
+
+<h3>1.4&nbsp;&nbsp;Related Work</h3>
+<p>Detrano et al. [2] collected these data to test whether a probability model for coronary disease transfers between institutions. Their logistic-regression-derived discriminant function, developed on Cleveland patients, achieved about 77% accuracy on Hungary, 79% on Long Beach and 81% on Switzerland (0.5 threshold) [1, 2]. Early machine-learning studies used only the Cleveland subset: Aha and Kibler's instance-based learner (NTgrowth) reached 77.0% and the C4 decision tree 74.8% accuracy, as recorded in the dataset documentation [1], and the CLASSIT conceptual clustering system 78.9% [19]. The Cleveland subset has since become a standard teaching benchmark. My project differs in two ways: it uses all four cohorts with an explicit strategy for their missing values, and it measures cross-hospital generalisation directly with leave-one-site-out validation.</p>
+
+<!-- ======================= 2 DATA ======================= -->
+<h2 id="sec-data">2&nbsp;&nbsp;Data</h2>
+
+<h3>2.1&nbsp;&nbsp;Data Source and Description</h3>
+<p>The data come from the UCI Machine Learning Repository [1]. The original databases contain 76 attributes, but the &ldquo;processed&rdquo; files used in all published experiments keep 14: 13 predictors and the diagnosis <code>num</code>. I downloaded the four processed files (Cleveland Clinic Foundation; Hungarian Institute of Cardiology, Budapest; University Hospitals Zurich and Basel, Switzerland; V.A. Medical Center, Long Beach, CA) and stacked them, adding a <code>site</code> column. This gives <b>920 patients</b>, all evaluated for suspected coronary disease and referred for angiography at these centres in the 1980s, so the label comes from a reference-standard test but the cohort is a referral population. The diagnosis <code>num</code> ranges from 0 (&lt;50% narrowing) to 4; following the dataset documentation and prior work, I binarise it as <i>disease</i> = <code>num</code> &gt; 0. The original codes are distributed 411 / 265 / 109 / 107 / 28 for 0&ndash;4, and the Hungarian file only uses 0 and 1. The binary target is reasonably balanced overall: <b>509 patients with disease (55.3%) and 411 without</b>. Table&nbsp;1 describes the features and Table&nbsp;2 the four cohorts.</p>
+
+<div class="tbl">
+<div class="cap"><b>Table 1:</b> Feature dictionary. &ldquo;Missing&rdquo; is the pooled percentage over all 920 patients after recoding impossible zeros as missing (Section&nbsp;2.2).</div>
+<table class="small">
+<thead><tr><th>Feature</th><th>Description</th><th>Type</th><th>Values / range</th><th>Missing</th></tr></thead>
+<tbody>
+<tr><td><code>age</code></td><td style="text-align:left">Age in years</td><td>continuous</td><td>28&ndash;77</td><td>0%</td></tr>
+<tr><td><code>sex</code></td><td style="text-align:left">Sex</td><td>binary</td><td>0 female, 1 male</td><td>0%</td></tr>
+<tr><td><code>cp</code></td><td style="text-align:left">Chest-pain type</td><td>nominal</td><td>typical / atypical angina, non-anginal, asymptomatic</td><td>0%</td></tr>
+<tr><td><code>trestbps</code></td><td style="text-align:left">Resting blood pressure (mm Hg)</td><td>continuous</td><td>80&ndash;200</td><td>6.5%</td></tr>
+<tr><td><code>chol</code></td><td style="text-align:left">Serum cholesterol (mg/dl)</td><td>continuous</td><td>85&ndash;603</td><td>22.0%</td></tr>
+<tr><td><code>fbs</code></td><td style="text-align:left">Fasting blood sugar &gt; 120 mg/dl</td><td>binary</td><td>0 no, 1 yes</td><td>9.8%</td></tr>
+<tr><td><code>restecg</code></td><td style="text-align:left">Resting ECG</td><td>nominal</td><td>normal, ST-T abnormality, LV hypertrophy</td><td>0.2%</td></tr>
+<tr><td><code>thalach</code></td><td style="text-align:left">Maximum heart rate in exercise test (bpm)</td><td>continuous</td><td>60&ndash;202</td><td>6.0%</td></tr>
+<tr><td><code>exang</code></td><td style="text-align:left">Exercise-induced angina</td><td>binary</td><td>0 no, 1 yes</td><td>6.0%</td></tr>
+<tr><td><code>oldpeak</code></td><td style="text-align:left">Exercise-induced ST depression (mm)</td><td>continuous</td><td>&minus;2.6 to 6.2</td><td>6.7%</td></tr>
+<tr><td><code>slope</code></td><td style="text-align:left">Slope of the peak-exercise ST segment</td><td>nominal (ordered)</td><td>upsloping, flat, downsloping</td><td>33.6%</td></tr>
+<tr><td><code>ca</code></td><td style="text-align:left">Major vessels coloured by fluoroscopy</td><td>ordinal count</td><td>0&ndash;3</td><td>66.4%</td></tr>
+<tr><td><code>thal</code></td><td style="text-align:left">Thallium stress-scan result</td><td>nominal</td><td>normal, fixed defect, reversible defect</td><td>52.8%</td></tr>
+<tr class="mid"><td><b>target</b></td><td style="text-align:left">Angiographic disease (<code>num</code> &gt; 0)</td><td>binary</td><td>0 absent, 1 present</td><td>0%</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="tbl">
+<div class="cap"><b>Table 2:</b> The four cohorts. &ldquo;Complete&rdquo; is the share of patients with no missing feature, i.e. the share that complete-case deletion would keep.</div>
+<table>
+<thead><tr><th>Hospital</th><th>Patients</th><th>Disease</th><th>Prevalence</th><th>Median age</th><th>Male</th><th>Complete</th></tr></thead>
+<tbody>
+<tr><td>Cleveland</td><td>303</td><td>139</td><td>45.9%</td><td>56</td><td>68.0%</td><td>98.0%</td></tr>
+<tr><td>Hungary</td><td>294</td><td>106</td><td>36.1%</td><td>49</td><td>72.4%</td><td>0.3%</td></tr>
+<tr><td>Switzerland</td><td>123</td><td>115</td><td>93.5%</td><td>56</td><td>91.9%</td><td>0.0%</td></tr>
+<tr><td>Long Beach VA</td><td>200</td><td>149</td><td>74.5%</td><td>60</td><td>97.0%</td><td>0.5%</td></tr>
+<tr class="mid"><td><b>All</b></td><td><b>920</b></td><td><b>509</b></td><td><b>55.3%</b></td><td>&mdash;</td><td>&mdash;</td><td><b>32.5%</b></td></tr>
+</tbody>
+</table>
+</div>
+
+<h3>2.2&nbsp;&nbsp;Data Quality</h3>
+<p>Missing values are coded as <code>?</code> in the files and are read as missing. Two kinds of placeholder are less obvious. <b>Cholesterol is 0 for 172 patients</b> (all 123 Swiss patients and 49 at Long Beach), and <b>resting blood pressure is 0 for one patient</b>. Neither value is physiologically possible, so I recode both as missing. This matters. The cholesterol zeros belong to high-prevalence hospitals (88.4% of these patients have disease), so leaving them in would make low cholesterol look like a risk factor. The rank-biserial correlation between cholesterol and disease is &minus;0.158 with the zeros but +0.146 without them, so the sign of the effect flips. I also found two pairs of exact duplicate rows (one in Hungary, one at Long Beach). I kept them because they may be different patients with identical values. One of the two pairs falls across the train/test split, so at most one of the 184 test patients has an identical training record, which is too few to affect the conclusions materially.</p>
+
+<h3>2.3&nbsp;&nbsp;Visual Analysis</h3>
+
+<figure>
+  <img src="../figures/eda_class_balance.png" alt="Disease prevalence by hospital">
+  <figcaption><b>Figure 1:</b> Patients with and without heart disease in each hospital. The pooled data set is roughly balanced (55.3% disease), but prevalence ranges from 36.1% (Hungary) to 93.5% (Switzerland, where only 8 patients are disease-free).</figcaption>
+</figure>
+
+<p><b>Class balance.</b> Figure&nbsp;1 shows that the pooled classes are balanced enough that re-sampling is not needed. The hospitals, however, differ greatly in prevalence (&chi;&sup2; = 157.4, <i>p</i> = 6.7&times;10<sup>&minus;34</sup>, Cram&eacute;r's V = 0.41). This has two consequences. First, &ldquo;which hospital?&rdquo; is itself predictive of the label. Second, any feature that reveals the hospital, such as a measurement that only one site records, can act as a proxy for prevalence.</p>
+
+<figure>
+  <img class="w80" src="../figures/eda_missingness.png" alt="Missing values by feature and hospital">
+  <figcaption><b>Figure 2:</b> Left: percentage of missing values per feature and hospital. Right: share of patients that complete-case deletion would keep, using all 13 features (dark) or without <code>ca</code>, <code>slope</code> and <code>thal</code> (light). Missingness is concentrated in a few features and is almost entirely determined by the hospital.</figcaption>
+</figure>
+
+<p><b>Missingness.</b> Figure&nbsp;2 is the key figure of the data analysis. Cleveland is essentially complete. The other three hospitals almost never recorded fluoroscopy (<code>ca</code>, 96&ndash;99% missing), and thallium (<code>thal</code>) is missing for 83&ndash;91% of patients in Hungary and Long Beach and 42% in Switzerland. Switzerland never recorded cholesterol, and 26.5% of Long Beach patients (53 of 200) have no exercise-test values at all. Complete-case deletion would keep 98% of Cleveland but almost no one else (32.5% of the data overall), so it would turn a four-hospital study back into a Cleveland study. Even dropping the three sparsest features would still lose every Swiss patient.</p>
+
+<figure>
+  <img class="w80" src="../figures/eda_numeric_distributions.png" alt="Numeric feature distributions by diagnosis">
+  <figcaption><b>Figure 3:</b> Distributions of the numeric features for patients with (red) and without (blue) disease; <i>r</i> is the rank-biserial effect size. Maximum heart rate (lower with disease), ST depression and the number of coloured vessels (higher with disease) separate the classes best; resting blood pressure and cholesterol barely do.</figcaption>
+</figure>
+
+<figure>
+  <img class="w80" src="../figures/eda_categorical_rates.png" alt="Disease rate per category level">
+  <figcaption><b>Figure 4:</b> Disease rate per level of each discrete feature (bars), with the number of patients per level (<i>n</i>) and the pooled prevalence (dashed). Grey bars are patients whose value is missing.</figcaption>
+</figure>
+
+<p><b>Univariate relationships.</b> Figures&nbsp;3 and&nbsp;4 show clear and clinically sensible patterns. Asymptomatic chest pain carries a 79.0% disease rate, against 13.8% for atypical angina. This sounds paradoxical, but it is well known in this data set: &ldquo;asymptomatic&rdquo; patients were referred for angiography for other reasons such as an abnormal ECG. Exercise-induced angina (83.7% disease when present), a flat or downsloping ST segment, a reversible thallium defect and more coloured vessels (26.5% disease for 0 vessels up to 85.0% for 3) all indicate disease. So do male sex (63.2% vs 25.8% for women), older age (median 57 vs 51 years) and a lower peak heart rate (median 128 vs 151 bpm). The grey &ldquo;missing&rdquo; bars in Figure&nbsp;4 do not sit at the pooled prevalence. Missing <code>slope</code>, for instance, has only a 37.5% disease rate, which is a first hint that missingness itself carries information.</p>
+
+<figure>
+  <img class="w80" src="../figures/eda_correlation.png" alt="Spearman correlation matrix">
+  <figcaption><b>Figure 5:</b> Pairwise Spearman correlations between the ordered features and the target (outlined bottom row), using all available pairs. No two predictors are strongly collinear (|&rho;| &le; 0.44), and the strongest correlations with disease are only moderate (|&rho;| &le; 0.48).</figcaption>
+</figure>
+
+<p><b>Correlations.</b> The correlation matrix (Figure&nbsp;5) shows no severe multicollinearity. The largest correlation between predictors is 0.44 (ST depression vs ST slope), and the exercise-test variables form a related group: heart rate, angina, ST depression and slope. No single feature correlates with disease by more than |&rho;| = 0.48 (<code>ca</code> 0.48, <code>exang</code> 0.46, <code>oldpeak</code> 0.40, <code>thalach</code> &minus;0.40). This suggests that a good classifier must <em>combine</em> several moderately informative features.</p>
+
+<figure>
+  <img src="../figures/eda_site_differences.png" alt="Feature distributions by hospital">
+  <figcaption><b>Figure 6:</b> Distributions of age, maximum heart rate, cholesterol and ST depression in each hospital. Patients differ systematically between sites, especially in age and peak heart rate.</figcaption>
+</figure>
+
+<figure>
+  <img src="../figures/eda_pca.png" alt="PCA projection">
+  <figcaption><b>Figure 7:</b> Two-dimensional PCA of the preprocessed training data (preprocessing fitted on the training set only), coloured by diagnosis (left) and by hospital (right). PC1 and PC2 explain 22.5% and 14.4% of the variance. The isolated cluster on the right consists of 44 Long Beach patients with no exercise-test values.</figcaption>
+</figure>
+
+<p><b>Hospital differences and structure.</b> Figure&nbsp;6 shows that the cohorts are genuinely different populations. Hungarian patients are younger (median 49 years vs 60 at Long Beach), and Swiss and Long Beach patients reach much lower peak heart rates (medians 121 and 120 bpm vs 153 in Cleveland). Kruskal&ndash;Wallis tests confirm differences in age (<i>H</i> = 202.1, <i>p</i> = 1.5&times;10<sup>&minus;43</sup>), heart rate (<i>H</i> = 161.7) and ST depression (<i>H</i> = 67.1), but not in blood pressure or cholesterol. The PCA projection (Figure&nbsp;7) shows two things. First, the classes overlap substantially in the leading two components, so no simple boundary exists. Second, the largest source of variance (PC1) is the <em>missingness pattern</em>, not a clinical quantity: it is driven by the missing indicators of resting blood pressure, peak heart rate and ST depression (loadings &asymp; 0.52) and isolates 44 Long Beach patients who had no exercise test.</p>
+
+<h3>2.4&nbsp;&nbsp;Statistical Analysis</h3>
+<p><b>Univariate tests.</b> I tested each feature's association with disease, using a Mann&ndash;Whitney U test for numeric features and a &chi;&sup2; test for discrete ones, with a Holm correction for 13 tests [22]. All 13 features are significantly associated with disease, but the effect sizes differ greatly (Table&nbsp;3). Chest-pain type, the thallium result, the number of vessels, exercise angina, peak heart rate and ST depression have moderate-to-large effects. Cholesterol, fasting blood sugar, blood pressure and resting ECG have weak ones.</p>
+
+<div class="tbl">
+<div class="cap"><b>Table 3:</b> Univariate association with disease (all 920 patients; descriptive only, no modelling choice is based on it). Effect size: Cram&eacute;r's V for discrete features, rank-biserial <i>r</i> for numeric features. All Holm-adjusted <i>p</i>-values are below 0.005.</div>
+<table class="small">
+<thead><tr><th>Feature</th><th>Effect</th><th>Holm <i>p</i></th><th>Feature</th><th>Effect</th><th>Holm <i>p</i></th></tr></thead>
+<tbody>
+<tr><td>Chest-pain type</td><td>V = 0.54</td><td>9.2&times;10<sup>&minus;57</sup></td><td>ST slope</td><td>V = 0.38</td><td>3.6&times;10<sup>&minus;19</sup></td></tr>
+<tr><td>Thallium result (<i>n</i> = 434)</td><td>V = 0.50</td><td>1.9&times;10<sup>&minus;23</sup></td><td>Age</td><td>r = +0.34</td><td>7.7&times;10<sup>&minus;18</sup></td></tr>
+<tr><td>Vessels coloured (<i>n</i> = 309)</td><td>r = +0.50</td><td>9.4&times;10<sup>&minus;17</sup></td><td>Sex</td><td>V = 0.31</td><td>9.3&times;10<sup>&minus;20</sup></td></tr>
+<tr><td>Exercise angina</td><td>V = 0.46</td><td>3.0&times;10<sup>&minus;41</sup></td><td>Cholesterol</td><td>r = +0.15</td><td>2.1&times;10<sup>&minus;3</sup></td></tr>
+<tr><td>Max heart rate</td><td>r = &minus;0.46</td><td>9.4&times;10<sup>&minus;31</sup></td><td>Fasting blood sugar</td><td>V = 0.14</td><td>1.6&times;10<sup>&minus;4</sup></td></tr>
+<tr><td>ST depression</td><td>r = +0.45</td><td>9.4&times;10<sup>&minus;31</sup></td><td>Resting BP / resting ECG</td><td>r = +0.13 / V = 0.11</td><td>2.6 / 2.9&times;10<sup>&minus;3</sup></td></tr>
+</tbody>
+</table>
+</div>
+
+<p><b>Is missingness informative?</b> Missing data can be missing completely at random, at random given other variables, or not at random [17]. Here, a naive &chi;&sup2; test says that missingness of four of the ten incomplete features (cholesterol, <code>ca</code>, fasting blood sugar and <code>slope</code>) is strongly associated with disease (e.g. cholesterol, <i>p</i> = 2.2&times;10<sup>&minus;16</sup>). However, this mostly re-detects the hospital: sites with more gaps also have higher prevalence. A Cochran&ndash;Mantel&ndash;Haenszel test <em>stratified by hospital</em> asks whether missingness predicts disease <em>within</em> a hospital. For cholesterol (<i>p</i> = 0.57), <code>ca</code> (<i>p</i> = 0.79) and fasting blood sugar (<i>p</i> = 0.32) it does not. These gaps are pure hospital signatures. The exception is <code>slope</code>: within hospitals, patients with a missing ST slope are much less likely to have disease (37.5% vs 51.9% expected from their hospitals; <i>p</i> = 3.1&times;10<sup>&minus;18</sup>), presumably because the slope is only recorded when the ST segment is abnormal. This analysis guides the preprocessing design and the interpretation in Section&nbsp;4.</p>
+
+<h3>2.5&nbsp;&nbsp;Preprocessing</h3>
+<p>The preprocessing steps and the reason for each are:</p>
+<ol>
+  <li><b>Cleaning</b> (Section&nbsp;2.2): <code>?</code> and impossible zeros become missing, and the target is binarised.</li>
+  <li><b>Train/test split.</b> An 80/20 split stratified jointly on <em>hospital &times; diagnosis</em> (seed 42): 736 training patients (55.3% disease) and 184 test patients (55.4%). Joint stratification gives the test set the same hospital mix (61 / 58 / 25 / 40 patients) and the same per-hospital prevalence as the training set. No preprocessing, tuning or threshold choice uses the test set. The frozen models are evaluated on it for the final results and the follow-up analyses in Sections 4.6.5&ndash;4.6.8. The LOSO and Cleveland experiments (Sections 4.6.3 and 4.6.9) are separate analyses that deliberately use all patients of the relevant hospitals.</li>
+  <li><b>Numeric features</b> (age, blood pressure, cholesterol, heart rate, ST depression, <code>ca</code>): median imputation plus a binary <em>missing indicator</em> for each feature that has gaps, followed by standardisation to zero mean and unit variance. The median is robust to the skewed cholesterol and ST-depression distributions. The indicators let the model learn that &ldquo;not measured&rdquo; may mean something (as for <code>slope</code>) instead of pretending that the imputed median was observed. Standardisation is required by the SVM's distance-based kernel and makes the logistic-regression penalty treat all coefficients equally. <code>ca</code> is an ordered count, so I keep it numeric.</li>
+  <li><b>Binary features</b> (sex, fasting blood sugar, exercise angina): mode imputation.</li>
+  <li><b>Nominal features</b> (chest pain, resting ECG, slope, thal): missing values become their own &ldquo;missing&rdquo; level, then one-hot encoding. The codes are labels, not quantities: <code>thal</code> = 7 is not &ldquo;more&rdquo; than 6.</li>
+</ol>
+<p>The result is 30 model inputs: 6 scaled numeric features, 5 missing indicators, 3 binary features and 16 one-hot columns. All steps live in a scikit-learn <code>ColumnTransformer</code> inside each model's <code>Pipeline</code>, so imputation medians and scaling statistics are recomputed on the training part of every CV fold and never see validation or test patients. I deliberately did <b>not</b> remove outliers or re-balance classes. The extreme values are clinically plausible (a negative ST depression is an ST elevation; cholesterol of 603 mg/dl occurs), and both regularisation and tree ensembles are robust to them. The 55/45 class split is mild. I also did not use the hospital as a feature, because a model meant for a new hospital cannot rely on it (this choice is tested in Section&nbsp;4.6.4). Two simpler alternatives are compared against this design in Section&nbsp;4.6.2: plain imputation without indicators, and dropping the three sparsest features.</p>
+
+<!-- ======================= 3 METHODS ======================= -->
+<h2 id="sec-methods">3&nbsp;&nbsp;Methods</h2>
+
+<p>After preprocessing, each patient is a vector \(\mathbf{x}\in\mathbb{R}^{d}\) (\(d=30\)) with label \(y\in\{0,1\}\). Every model learns a score \(\hat p(\mathbf{x})\approx P(y=1\mid\mathbf{x})\), and a patient is predicted positive when \(\hat p(\mathbf{x})\ge t\), with \(t=0.5\) unless stated otherwise. I chose three algorithms from the course that sit at different points of the bias&ndash;variance spectrum: a linear parametric model, a kernel-based maximum-margin model and an ensemble of decision trees. All are implemented with scikit-learn [4] and share the preprocessing of Section&nbsp;2.5.</p>
+
+<h3>3.1&nbsp;&nbsp;Logistic Regression (LR)</h3>
+<p><b>Model.</b> Logistic regression models the log-odds of disease as a linear function of the features and maps it to a probability with the sigmoid function:</p>
+<div class="eq">\[ \hat p(\mathbf{x}) = \sigma(\mathbf{w}^{\top}\mathbf{x}+b), \qquad \sigma(z)=\frac{1}{1+e^{-z}}, \qquad \log\frac{\hat p}{1-\hat p}=\mathbf{w}^{\top}\mathbf{x}+b. \]</div>
+<p><b>Training.</b> The weights minimise the regularised negative log-likelihood (cross-entropy). With labels recoded as \(\tilde y_i\in\{-1,+1\}\), the objective solved by the <code>liblinear</code> solver is</p>
+<div class="eq">\[ \min_{\mathbf{w},b}\; R(\mathbf{w}) + C\sum_{i=1}^{n}\log\!\left(1+e^{-\tilde y_i(\mathbf{w}^{\top}\mathbf{x}_i+b)}\right), \qquad R(\mathbf{w})=\tfrac12\lVert\mathbf{w}\rVert_2^2 \;\;\text{(L2)}\quad\text{or}\quad \lVert\mathbf{w}\rVert_1 \;\;\text{(L1)}. \]</div>
+<p>(<code>liblinear</code> also applies the penalty to the intercept, a minor detail omitted from the formula.) The loss is convex, so the solver finds the global optimum. \(C\) is the <em>inverse</em> regularisation strength. A small \(C\) shrinks the weights towards zero (higher bias, lower variance), while a large \(C\) fits the training data more closely. The L1 penalty can set weights exactly to zero and so performs feature selection [16]. L2 shrinks all weights smoothly and copes better with correlated inputs, such as the one-hot levels of one categorical feature.</p>
+<p><b>Hyperparameters searched.</b> \(C\in\{0.001,0.01,0.1,1,10,100\}\) &times; penalty \(\in\{\text{L1},\text{L2}\}\) (12 candidates).</p>
+<p><b>Why it makes sense here.</b> LR is the standard model for clinical risk scores; the original study of this data used a logistic-regression-derived function [2]. That makes LR the natural reference point. \(e^{w_j}\) is an odds ratio, which a clinician can understand directly: per one standard deviation for the standardised numeric features and missing indicators, and for presence versus absence for binary and one-hot features. Its limitation is the linear decision boundary: it cannot represent interactions such as chest-pain type &times; exercise angina unless they are engineered by hand.</p>
+
+<h3>3.2&nbsp;&nbsp;Support Vector Machine with an RBF Kernel (SVM)</h3>
+<p><b>Model.</b> A soft-margin SVM [6] looks for the separating hyperplane with the largest margin in a feature space \(\phi(\mathbf{x})\). Slack variables \(\xi_i\) allow some points to violate the margin:</p>
+<div class="eq">\[ \min_{\mathbf{w},b,\boldsymbol{\xi}}\;\tfrac12\lVert\mathbf{w}\rVert^{2}+C\sum_{i=1}^{n}\xi_i \quad\text{s.t.}\quad \tilde y_i\big(\mathbf{w}^{\top}\phi(\mathbf{x}_i)+b\big)\ge 1-\xi_i,\;\; \xi_i\ge 0. \]</div>
+<p>Solving the dual problem gives a decision function that depends on the training data only through a kernel \(K\) and the non-zero dual coefficients \(0\le\alpha_i\le C\) of the <em>support vectors</em>. I use the Gaussian (RBF) kernel, which corresponds to an infinite-dimensional feature space:</p>
+<div class="eq">\[ f(\mathbf{x})=\sum_{i\in\mathcal{SV}}\alpha_i\tilde y_i\,K(\mathbf{x}_i,\mathbf{x})+b, \qquad K(\mathbf{x},\mathbf{x}')=\exp\!\big(-\gamma\lVert\mathbf{x}-\mathbf{x}'\rVert^{2}\big). \]</div>
+<p>\(C\) trades margin width against training errors. \(\gamma\) sets the kernel width. A large \(\gamma\) lets each support vector influence only its close neighbours, which produces a wiggly boundary that can over-fit. A small \(\gamma\) gives an almost linear boundary.</p>
+<p><b>Probabilities.</b> \(f(\mathbf{x})\) is a signed distance, not a probability. To obtain \(\hat p(\mathbf{x})\), which threshold selection and calibration analysis need, I apply Platt scaling [7]. A sigmoid \(\hat p(\mathbf{x})=1/(1+\exp(A f(\mathbf{x})+B))\) is fitted to out-of-fold decision values from an internal 5-fold split of the training data, using scikit-learn's <code>CalibratedClassifierCV</code> with the sigmoid method.</p>
+<p><b>Hyperparameters searched.</b> \(C\in\{0.1,0.5,1,5,10,50\}\) &times; \(\gamma\in\{\text{scale},0.001,0.01,0.05,0.1\}\) (30 candidates; &ldquo;scale&rdquo; = \(1/(d\cdot\mathrm{Var}(\mathbf{X}))\)).</p>
+<p><b>Why it makes sense here.</b> The data set is small (736 training patients), but the boundary between healthy and diseased patients need not be linear. Maximum-margin training controls over-fitting well in exactly this small-\(n\) regime, and the RBF kernel adds non-linearity without hand-crafted features. Because the kernel is based on Euclidean distances, the SVM is sensitive to feature scale, which is why standardisation is part of the pipeline (Section&nbsp;4.6.2 shows how much this matters).</p>
+
+<h3>3.3&nbsp;&nbsp;Random Forest (RF)</h3>
+<p><b>Model.</b> A random forest [5] is an ensemble of \(B\) decision trees. Each tree is grown on a bootstrap sample of the training set, and at every node only a random subset of \(m\) features is considered for the split. A split of node \(S\) into \(S_L\) and \(S_R\) is chosen to maximise the decrease in Gini impurity:</p>
+<div class="eq">\[ G(S)=1-\sum_{k\in\{0,1\}}p_k(S)^2, \qquad \Delta G = G(S)-\frac{|S_L|}{|S|}G(S_L)-\frac{|S_R|}{|S|}G(S_R), \]</div>
+<p>where \(p_k(S)\) is the fraction of class \(k\) in the node. The forest prediction averages the class-probability estimates of its trees: \(\hat p(\mathbf{x})=\frac1B\sum_{b=1}^{B}\hat p_b(\mathbf{x})\).</p>
+<p><b>Why averaging works.</b> A single deep tree has low bias but very high variance. If each tree has variance \(\sigma^2\) and the pairwise correlation between trees is \(\rho\), the variance of their average is [8]</p>
+<div class="eq">\[ \mathrm{Var}\big[\hat p(\mathbf{x})\big]=\rho\,\sigma^{2}+\frac{1-\rho}{B}\,\sigma^{2}. \]</div>
+<p>Bagging removes the second term as \(B\) grows, and random feature sub-sampling lowers \(\rho\) and therefore the first term.</p>
+<p><b>Hyperparameters searched.</b> \(B=500\) trees; <code>max_depth</code> \(\in\{\text{none},4,6,10\}\) &times; <code>min_samples_leaf</code> \(\in\{1,3,5,10\}\) &times; <code>max_features</code> \(m\in\{\sqrt d,\,0.5d\}\) (32 candidates).</p>
+<p><b>Why it makes sense here.</b> The predictors mix continuous measurements, binary flags and unordered categories. Trees handle all of these natively, are unaffected by feature scaling, and capture interactions and thresholds automatically (e.g. &ldquo;asymptomatic chest pain <em>and</em> flat ST slope&rdquo;). RF also provides feature-importance estimates that can be compared with the LR coefficients.</p>
+
+<h3>3.4&nbsp;&nbsp;Baseline</h3>
+<p>A majority-class classifier always predicts &ldquo;disease&rdquo;, the more common class in the training set. It sets the floor every model must beat: its accuracy equals the disease prevalence (0.554 on the test set), its specificity is 0 and its ROC-AUC is 0.5.</p>
+
+<!-- ======================= 4 RESULTS ======================= -->
+<h2 id="sec-results">4&nbsp;&nbsp;Results</h2>
+
+<h3>4.1&nbsp;&nbsp;Experimental Setup</h3>
+<p><b>Protocol.</b> All tuning and threshold selection happens on the 736-patient training set; the 184-patient test set is held out from those decisions.</p>
+<ol>
+  <li><b>Tuning.</b> For each model, a grid search (<code>GridSearchCV</code>) over the grids of Section&nbsp;3 with stratified 5-fold CV, selecting the configuration with the highest mean validation ROC-AUC, which is then refitted on the whole training set. ROC-AUC is threshold-free and measures how well a model <em>ranks</em> diseased above healthy patients, which is the right criterion before an operating threshold is chosen.</li>
+  <li><b>Performance distribution.</b> The tuned pipelines are evaluated with repeated stratified 5-fold CV (10 repeats = 50 folds) on the training set, giving a mean &plusmn; standard deviation for every metric.</li>
+  <li><b>Nearly unbiased estimate.</b> Because tuning and evaluation on the same folds is slightly optimistic, I also run a <b>nested CV</b> [12]: an outer stratified 5-fold loop in which the complete grid search is repeated inside each outer training fold.</li>
+  <li><b>Final test.</b> Each tuned model is evaluated on the held-out test set, with 95% percentile-bootstrap confidence intervals (2,000 resamples of the 184 test patients).</li>
+</ol>
+<p><b>Metrics.</b> Accuracy; precision, i.e. positive predictive value \(\frac{TP}{TP+FP}\); recall or sensitivity \(\frac{TP}{TP+FN}\); specificity \(\frac{TN}{TN+FP}\); F1, the harmonic mean of precision and recall; ROC-AUC [20]; average precision (area under the precision&ndash;recall curve); and, for calibration, the Brier score \(\frac1n\sum_i(\hat p_i-y_i)^2\).</p>
+<p><b>Statistical comparison.</b> CV folds overlap, so a plain paired <i>t</i>-test over folds is over-confident. I therefore use the Nadeau&ndash;Bengio <em>corrected resampled t-test</em> [9] on the 50 paired fold scores, which estimates the variance of the mean difference as \(\big(\frac1J+\frac{n_{\text{val}}}{n_{\text{train}}}\big)\hat\sigma^2\) instead of the naive \(\hat\sigma^2/J\), where \(\hat\sigma^2\) is the variance of the \(J=50\) paired fold differences and \(n_{\text{val}}/n_{\text{train}}\approx1/4\). On the test set I use the exact McNemar test on the discordant predictions [10, 21] and DeLong's test for correlated ROC curves [11]. <i>p</i>-values are Holm-corrected within each family of three model pairs [22].</p>
+<p><b>Implementation.</b> Python 3.14 with scikit-learn 1.9, pandas 3.0, NumPy, SciPy and Matplotlib, with random seed 42 everywhere. The whole analysis (4 scripts, 25 figures, 49 result files) is reproduced by one command, <code>python run_all.py</code>, in about 4 minutes on a laptop CPU.</p>
+
+<h3>4.2&nbsp;&nbsp;Hyperparameter Tuning</h3>
+
+<div class="tbl">
+<div class="cap"><b>Table 4:</b> Selected hyperparameters (best mean 5-fold CV ROC-AUC on the training set) and the stability of that choice across the five outer folds of nested CV.</div>
+<table>
+<thead><tr><th>Model</th><th>Selected configuration</th><th>CV AUC</th><th>Nested-CV choice</th></tr></thead>
+<tbody>
+<tr><td>Logistic Regression</td><td>L2 penalty, \(C = 0.1\)</td><td>0.8958</td><td>same in 5/5 folds</td></tr>
+<tr><td>SVM (RBF)</td><td>\(C = 5,\ \gamma = 0.01\)</td><td>0.8970</td><td>4 different settings in 5 folds</td></tr>
+<tr><td>Random Forest</td><td>500 trees, depth unlimited, <code>min_samples_leaf</code> = 5, \(m=\sqrt d\)</td><td>0.8900</td><td>depth 6 or 10, leaf 1 or 5</td></tr>
+</tbody>
+</table>
+</div>
+
+<figure>
+  <img src="../figures/results_tuning.png" alt="Hyperparameter search landscapes">
+  <figcaption><b>Figure 8:</b> Grid-search landscapes (mean 5-fold CV ROC-AUC, training set). Left: LR with L1 and L2 penalties as a function of \(C\). Middle: SVM over \(C\times\gamma\). Right: RF over depth &times; minimum leaf size (<code>max_features</code> = &radic;d). Outlined cells mark the selected configurations.</figcaption>
+</figure>
+
+<p>Figure&nbsp;8 shows that all three landscapes are <b>flat near the optimum</b>. For LR, every \(C\ge 0.01\) with L2 gives an AUC within about 0.01 of the best; only very strong L1 regularisation (\(C = 0.001\)) collapses the model to a constant (AUC 0.5) by zeroing all weights. The SVM is good over a broad band and degrades only when large \(C\) meets large \(\gamma\) (AUC 0.833 at \(C=50,\gamma=0.1\)), the over-fitting corner. The random forest varies by less than 0.01 AUC across all depth and leaf settings with \(m=\sqrt d\). The flatness explains why the SVM's selected setting changes between nested-CV folds: several settings are statistically tied, so the choice depends on which patients land in which fold. It also means the results are not sensitive to the exact grid.</p>
+
+<h3>4.3&nbsp;&nbsp;Cross-Validation Results</h3>
+
+<div class="tbl">
+<div class="cap"><b>Table 5:</b> Cross-validated performance on the training set. Top: repeated stratified 5&times;10 CV with the tuned models (mean &plusmn; SD over 50 folds). Bottom: nested CV (outer 5 folds), a nearly unbiased estimate that includes the tuning step.</div>
+<table>
+<thead><tr><th>Model</th><th>Accuracy</th><th>Precision</th><th>Recall</th><th>Specificity</th><th>F1</th><th>ROC-AUC</th></tr></thead>
+<tbody>
+<tr><td>Logistic Regression</td><td>0.816 &plusmn; 0.026</td><td>0.826</td><td>0.846</td><td>0.779</td><td>0.836 &plusmn; 0.025</td><td>0.896 &plusmn; 0.024</td></tr>
+<tr><td>SVM (RBF)</td><td class="best">0.822 &plusmn; 0.026</td><td class="best">0.830</td><td>0.854</td><td class="best">0.782</td><td class="best">0.841 &plusmn; 0.025</td><td class="best">0.897 &plusmn; 0.023</td></tr>
+<tr><td>Random Forest</td><td>0.819 &plusmn; 0.027</td><td>0.820</td><td class="best">0.864</td><td>0.763</td><td>0.840 &plusmn; 0.023</td><td>0.891 &plusmn; 0.026</td></tr>
+<tr><td>Majority baseline</td><td>0.553 &plusmn; 0.003</td><td>0.553</td><td>1.000</td><td>0.000</td><td>0.712</td><td>0.500</td></tr>
+<tr class="mid"><td>LR &mdash; nested</td><td>0.813 &plusmn; 0.031</td><td colspan="3" class="note">tuning repeated inside each outer fold</td><td>0.831</td><td>0.896 &plusmn; 0.027</td></tr>
+<tr><td>SVM &mdash; nested</td><td>0.819 &plusmn; 0.021</td><td colspan="3"></td><td>0.839</td><td>0.895 &plusmn; 0.025</td></tr>
+<tr><td>RF &mdash; nested</td><td>0.822 &plusmn; 0.026</td><td colspan="3"></td><td>0.842</td><td>0.888 &plusmn; 0.022</td></tr>
+</tbody>
+</table>
+</div>
+
+<figure>
+  <img src="../figures/results_cv_boxplot.png" alt="Cross-validation score distributions">
+  <figcaption><b>Figure 9:</b> ROC-AUC and F1 for each of the 50 validation folds of the repeated CV. The three models' distributions overlap almost completely and lie far above the majority baseline.</figcaption>
+</figure>
+
+<p>All three models reach a CV ROC-AUC of about 0.89&ndash;0.90 and an accuracy of about 0.82, compared with 0.553 for the baseline (Table&nbsp;5, Figure&nbsp;9). The fold-to-fold standard deviation (&asymp;0.025 AUC) is <em>more than four times larger</em> than the largest difference between model means (0.006). The nested estimates are within 0.003 AUC of the non-nested ones, so the optimism from tuning on the same data is negligible, which is expected given the flat landscapes in Figure&nbsp;8.</p>
+
+<h3>4.4&nbsp;&nbsp;Test-Set Results</h3>
+
+<div class="tbl">
+<div class="cap"><b>Table 6:</b> Held-out test set (<i>n</i> = 184, threshold 0.5) with 95% bootstrap confidence intervals. The best value in each column is bold.</div>
+<table class="small">
+<thead><tr><th>Model</th><th>Accuracy</th><th>Precision</th><th>Recall</th><th>Specificity</th><th>F1</th><th>ROC-AUC</th><th>Avg. prec.</th></tr></thead>
+<tbody>
+<tr><td>Logistic Regression</td><td>0.837<br>[0.783, 0.891]</td><td class="best">0.840</td><td>0.873<br>[0.806, 0.936]</td><td class="best">0.793</td><td>0.856<br>[0.804, 0.905]</td><td class="best">0.914<br>[0.866, 0.953]</td><td>0.922</td></tr>
+<tr><td>SVM (RBF)</td><td class="best">0.848<br>[0.799, 0.897]</td><td>0.830</td><td class="best">0.912<br>[0.853, 0.964]</td><td>0.768</td><td class="best">0.869<br>[0.819, 0.914]</td><td>0.913<br>[0.868, 0.953]</td><td class="best">0.923</td></tr>
+<tr><td>Random Forest</td><td>0.842<br>[0.788, 0.891]</td><td>0.835</td><td>0.892<br>[0.829, 0.950]</td><td>0.780</td><td>0.863<br>[0.811, 0.908]</td><td>0.900<br>[0.850, 0.943]</td><td>0.907</td></tr>
+<tr><td>Majority baseline</td><td>0.554<br>[0.484, 0.625]</td><td>0.554</td><td>1.000</td><td>0.000</td><td>0.713</td><td>0.500</td><td>0.554</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="keep"><figure class="pair">
+  <div><img src="../figures/results_roc_curves.png" alt="ROC curves"></div>
+  <div><img src="../figures/results_pr_curves.png" alt="Precision-recall curves"></div>
+</figure>
+<figure style="margin-top:-6px">
+  <figcaption><b>Figure 10:</b> Test-set ROC curves (left) and precision&ndash;recall curves (right). All three models are far from the chance diagonal and the no-skill precision line (0.554). The curves cross repeatedly, and no model dominates over the full threshold range.</figcaption>
+</figure></div>
+
+<figure>
+  <img src="../figures/results_confusion_matrices.png" alt="Confusion matrices">
+  <figcaption><b>Figure 11:</b> Test-set confusion matrices at threshold 0.5 (counts and percentage of the actual class). The SVM misses the fewest diseased patients (9 of 102) at the price of the most false alarms (19 of 82).</figcaption>
+</figure>
+
+<p>On the held-out test set (Table&nbsp;6, Figures&nbsp;10&ndash;11, Appendix Figure&nbsp;A1) the models reach a ROC-AUC of 0.900&ndash;0.914 and an accuracy of 0.837&ndash;0.848. They correctly classify about 155 of 184 patients, against 102 for the baseline. LR has the highest AUC and specificity, while the SVM has the highest accuracy, recall (91.2%) and F1. The test scores are slightly higher than the CV means but well inside the bootstrap intervals, which are wide (about &plusmn;0.04&ndash;0.05 for AUC, F1 and accuracy, and up to &plusmn;0.09 for specificity) because the test set is small.</p>
+<p><b>Are the differences real?</b> No. Table&nbsp;7 shows that none of the twelve pairwise tests comes close to significance. On the test set the models disagree on only 6&ndash;9 patients per pair, and the largest AUC gap (LR vs RF, 0.014) has a DeLong <i>p</i> of 0.27.</p>
+
+<div class="tbl">
+<div class="cap"><b>Table 7:</b> Pairwise model comparisons (difference = first minus second model; Holm-adjusted <i>p</i> in brackets where different from raw <i>p</i>).</div>
+<table class="small">
+<thead><tr><th>Pair</th><th>CV AUC diff. (corrected <i>t</i>)</th><th>CV accuracy diff. (corrected <i>t</i>)</th><th>Test accuracy (exact McNemar)</th><th>Test AUC diff. (DeLong)</th></tr></thead>
+<tbody>
+<tr><td>LR vs SVM</td><td>&minus;0.0004, <i>p</i> = 0.88</td><td>&minus;0.0053, <i>p</i> = 0.53 [1.0]</td><td>2 vs 4 discordant, <i>p</i> = 0.69 [1.0]</td><td>+0.0010, <i>p</i> = 0.87</td></tr>
+<tr><td>LR vs RF</td><td>+0.0054, <i>p</i> = 0.19 [0.56]</td><td>&minus;0.0023, <i>p</i> = 0.84 [1.0]</td><td>4 vs 5 discordant, <i>p</i> = 1.0</td><td>+0.0140, <i>p</i> = 0.27 [0.82]</td></tr>
+<tr><td>SVM vs RF</td><td>+0.0058, <i>p</i> = 0.19 [0.56]</td><td>+0.0030, <i>p</i> = 0.80 [1.0]</td><td>5 vs 4 discordant, <i>p</i> = 1.0</td><td>+0.0130, <i>p</i> = 0.36 [0.82]</td></tr>
+</tbody>
+</table>
+</div>
+
+<p><b>Per hospital.</b> Cleveland has the highest AUC (0.95&ndash;0.96, accuracy 0.87&ndash;0.90) and Hungary, the largest cohort with incomplete data, the lowest AUC among sites where it is measurable (0.83&ndash;0.84, accuracy 0.79&ndash;0.81). Hungary also has the lowest accuracy for LR and the SVM; for RF the lowest is Long Beach (0.80). The 25 Swiss test patients include only 2 without disease, so their per-site AUC is not meaningful.</p>
+
+<h3>4.5&nbsp;&nbsp;Discussion: Do the Models Perform as Expected?</h3>
+<p>Mostly yes. All three models are far better than the baseline. Their accuracy is in line with what is documented for this data: about 77&ndash;81% for the original logistic-regression function across sites [2], and 75&ndash;79% for early ML methods on Cleveland alone [1, 19]. I expected at least a small advantage for the non-linear SVM and RF. Instead, the simple linear model is statistically tied with both and has the best test AUC. Three observations explain this. First, the EDA showed that each informative feature relates to disease in a roughly <em>monotone</em> way (Figures&nbsp;3&ndash;4), which a linear model on one-hot and standardised inputs captures well. Second, with 736 patients the extra flexibility of the RBF kernel and the deep trees has more room to fit noise than signal. The learning curves in Section&nbsp;4.6.1 confirm this. Third, the remaining errors come from patients whose features genuinely look like the other class (Section&nbsp;4.6.8), and no classifier can fix that. Two weaknesses stand out despite the good average numbers. Specificity is only 0.77&ndash;0.79, so about one in five healthy patients would be flagged. And as Section&nbsp;4.6.3 shows, these random-split numbers are optimistic for a hospital the model has never seen. A further limitation is the population: every patient was referred for angiography in the 1980s, so prevalence is far higher than in general screening and the results apply to triage of already-suspected patients, not to the general public.</p>
+
+<h3>4.6&nbsp;&nbsp;Experiments Supporting the Analysis</h3>
+<p>Each experiment below answers one question raised by the results. Unless noted otherwise, experiments use the training set with stratified CV and the hyperparameters of Table&nbsp;4 (5 folds &times; 3 repeats = 15 paired folds, identical across settings so that differences are paired).</p>
+
+<h4>4.6.1&nbsp;&nbsp;Is performance limited by the data or by the models? (learning and validation curves)</h4>
+
+<figure>
+  <img src="../figures/exp_model_learning_curves.png" alt="Learning curves">
+  <figcaption><b>Figure 12:</b> Learning curves: training (dashed) and validation (solid) ROC-AUC as a function of training-set size, with &plusmn;1 SD bands (the largest size, 588, is a full CV training fold).</figcaption>
+</figure>
+
+<figure>
+  <img src="../figures/exp_model_validation_curves.png" alt="Validation curves">
+  <figcaption><b>Figure 13:</b> Validation (complexity) curves. Training (dashed) and CV (solid) ROC-AUC as one hyperparameter varies while the others stay at their tuned values (dotted line).</figcaption>
+</figure>
+
+<p>The learning curves (Figure&nbsp;12) flatten early. Doubling the training size from 294 to 588 patients raises the CV AUC by only 0.007&ndash;0.010, and all three models plateau at about 0.89&ndash;0.90. LR and the SVM show small train&ndash;validation gaps (0.013 and 0.024), so they are <em>bias-limited</em>. The random forest fits the training data much better (training AUC 0.958) but generalises no better, with a gap of 0.067: it has more variance, not more useful signal. The validation curves (Figure&nbsp;13) show the classic inverted-U shape of the CV AUC for the SVM's \(\gamma\). At \(\gamma=3\) the training AUC reaches 1.0 while the CV AUC drops to 0.80, which is textbook over-fitting. For RF, AUC stops improving beyond depth &asymp;5 and about 100 trees. Every tuned value lies within 0.001 AUC of the best point on its curve. <b>Conclusion:</b> more model capacity or finer tuning will not help; better or more complete features would.</p>
+
+<h4>4.6.2&nbsp;&nbsp;How much does preprocessing matter? (ablation)</h4>
+
+<figure>
+  <img src="../figures/exp_data_preprocessing.png" alt="Preprocessing ablation">
+  <figcaption><b>Figure 14:</b> CV ROC-AUC and accuracy (mean &plusmn; SD, 15 folds) under four preprocessing settings, plus complete-case analysis (hollow markers: a different, smaller and almost Cleveland-only population, so not directly comparable).</figcaption>
+</figure>
+
+<p>Figure&nbsp;14 compares the default pipeline with three alternatives. Removing the missing-value indicators and the &ldquo;missing&rdquo; category (plain imputation) costs 0.011&ndash;0.020 AUC and about 2&ndash;3 points of accuracy. Dropping the three sparse features (<code>ca</code>, <code>slope</code>, <code>thal</code>) costs 0.019&ndash;0.028 AUC. So these features are useful even though they are mostly missing, because they are very informative when present. Turning off standardisation leaves LR and RF almost unchanged (&Delta;AUC &minus;0.004 and &minus;0.0001; trees are scale-invariant). It <b>breaks the SVM</b>, however: AUC falls from 0.898 to 0.680, because unscaled cholesterol (hundreds of mg/dl) dominates the Euclidean distances in the RBF kernel and \(\gamma=0.01\) was tuned for standardised inputs. Complete-case analysis keeps only 239 of 736 training patients, 238 of them from Cleveland, and is therefore not a usable strategy for a multi-hospital model.</p>
+
+<h4>4.6.3&nbsp;&nbsp;Does the model work at a hospital it has never seen? (leave-one-site-out)</h4>
+<p>A random split puts patients from every hospital into both training and test sets. A more realistic deployment test trains on three hospitals and tests on the fourth. Table&nbsp;8 and Figure&nbsp;15 report this leave-one-site-out (LOSO) evaluation.</p>
+
+<div class="tbl">
+<div class="cap"><b>Table 8:</b> Leave-one-site-out: models trained on all patients of the other three hospitals, evaluated on the held-out hospital (ROC-AUC with 95% bootstrap CI / accuracy). Switzerland has only 8 disease-free patients, so its AUC is very uncertain. &ldquo;Majority acc.&rdquo; predicts the majority class of the three <em>training</em> hospitals: &ldquo;disease&rdquo; for Cleveland and Hungary, but &ldquo;no disease&rdquo; for Switzerland and Long Beach (training prevalence 49.4% and an exact 50% tie), hence their low values.</div>
+<table class="small">
+<thead><tr><th>Held-out hospital</th><th>Logistic Regression</th><th>SVM (RBF)</th><th>Random Forest</th><th>Majority acc.</th></tr></thead>
+<tbody>
+<tr><td>Cleveland (303)</td><td>0.900 [0.864, 0.933]<br>/ 0.838</td><td>0.875 [0.832, 0.911]<br>/ 0.746</td><td>0.877 [0.836, 0.915]<br>/ 0.726</td><td>0.459</td></tr>
+<tr><td>Hungary (294)</td><td>0.897 [0.858, 0.932]<br>/ 0.776</td><td>0.877 [0.835, 0.917]<br>/ 0.643</td><td>0.896 [0.858, 0.930]<br>/ 0.755</td><td>0.361</td></tr>
+<tr><td>Switzerland (123)</td><td>0.729 [0.501, 0.934]<br>/ 0.780</td><td>0.710 [0.470, 0.932]<br>/ 0.797</td><td>0.744 [0.500, 0.971]<br>/ 0.772</td><td>0.065</td></tr>
+<tr><td>Long Beach VA (200)</td><td>0.715 [0.631, 0.797]<br>/ 0.735</td><td>0.663 [0.578, 0.747]<br>/ 0.725</td><td>0.722 [0.635, 0.806]<br>/ 0.685</td><td>0.255</td></tr>
+<tr class="mid"><td><b>Mean over sites</b></td><td><b>0.810 / 0.782</b></td><td><b>0.781 / 0.728</b></td><td><b>0.809 / 0.735</b></td><td></td></tr>
+<tr><td>Random split (Table 6)</td><td>0.914 / 0.837</td><td>0.913 / 0.848</td><td>0.900 / 0.842</td><td>0.554</td></tr>
+</tbody>
+</table>
+</div>
+
+<figure>
+  <img class="w90" src="../figures/exp_data_loso.png" alt="Leave-one-site-out results">
+  <figcaption><b>Figure 15:</b> ROC-AUC (top) and accuracy (bottom) on each held-out hospital (filled circles), compared with the same hospital's patients under the random split (hollow diamonds). Grey bars mark the accuracy on the held-out hospital of always predicting the majority class of the three training hospitals.</figcaption>
+</figure>
+
+<p>The mean LOSO AUC (0.78&ndash;0.81) is 0.09&ndash;0.13 below the pooled random-split AUC, but that gap mixes two effects because pooled AUC also rewards ranking patients between hospitals. A like-for-like comparison of per-hospital AUCs, excluding Switzerland (only 2 healthy test patients), gives a drop of <b>0.06&ndash;0.09</b> (LR 0.902 to 0.837, SVM 0.893 to 0.805, RF 0.897 to 0.831). The change is uneven: Cleveland and especially Long Beach fall, while Hungary rises (LR 0.830 to 0.897). Cleveland and Hungary, the two largest and most complete cohorts, transfer well (AUC 0.87&ndash;0.90). Long Beach VA transfers worst (AUC 0.66&ndash;0.72): it is mostly male, older and has many patients without exercise tests, a combination the other sites rarely show. Accuracy also falls (by 0.05 for LR, 0.12 for the SVM and 0.11 for RF against the pooled random split), partly because of poor <em>calibration-in-the-large</em> [24]: the mean predicted probability no longer matches the new hospital's prevalence. A model's predicted probabilities are anchored to the prevalence of the hospitals it was trained on. For example, when Switzerland (93.5% disease) is held out, the models predict an average probability of only 0.63&ndash;0.68 (Appendix Figure&nbsp;A3). On the same-hospital comparison without Switzerland, the 0.5 threshold suffers more than ranking for the SVM (accuracy &minus;0.14 vs AUC &minus;0.09) and RF (&minus;0.12 vs &minus;0.07), but not for LR (&minus;0.04 vs &minus;0.06).</p>
+<p>LR and RF tie on LOSO AUC (0.810 vs 0.809), and LR is best on LOSO accuracy (0.782), mainly because its probabilities are better calibrated on Cleveland. The LOSO accuracies on Hungary (0.78), Long Beach (0.74) and Switzerland (0.78) are of the same order as Detrano et al.'s 77&ndash;81% for a function transferred from Cleveland [2]. Its lesson still holds 37 years later: the Cleveland-derived probabilities were over-estimated in Hungary and Long Beach and under-estimated in Switzerland [2], so a diagnostic model must be checked at the site where it will be used. (LOSO is still mildly optimistic, because the hyperparameters were tuned on pooled training data that included patients from the held-out hospital.)</p>
+
+<h4>4.6.4&nbsp;&nbsp;Is missingness a hospital fingerprint?</h4>
+
+<figure>
+  <img src="../figures/exp_data_site_signal.png" alt="Missingness as hospital signal">
+  <figcaption><b>Figure 16:</b> (a) The hospital can be predicted from the 13 missing-value flags alone (CV accuracy 0.85 vs 0.33 for the majority site). (b) The flags alone predict disease with CV AUC 0.75, close to using the hospital identity itself (0.72). (c) Adding the hospital as an explicit feature changes CV AUC by less than 0.006.</figcaption>
+</figure>
+
+<p>Section&nbsp;2.4 suggested that missingness mostly encodes the hospital. Figure&nbsp;16 confirms this directly. A logistic regression that sees <em>only</em> which values are missing identifies the hospital correctly for 85% of patients (99% of Cleveland patients). The same flags alone predict disease with an AUC of 0.75, more than the hospital identity alone (0.72), because they also contain the genuinely informative <code>slope</code> gap. This is a form of <em>shortcut learning</em> [13, 14]: part of what the models learn is &ldquo;this patient comes from a high-prevalence hospital&rdquo;, which is valid within these four hospitals but would not transfer to a new one with different record-keeping. It may also contribute to the LOSO drop. Adding the hospital as an explicit feature improves CV AUC by only +0.001 to +0.005. The gain is small but consistent (better in 11&ndash;14 of the 15 paired folds), which fits the idea that the models already infer most of the hospital signal from the missingness pattern. I therefore kept the hospital out of the final models.</p>
+
+<h4>4.6.5&nbsp;&nbsp;What drives the predictions? (feature importance)</h4>
+<p>The LR coefficients (Figure&nbsp;17) agree with the clinical picture of Section&nbsp;2.3. More coloured vessels (OR 1.68 per SD), asymptomatic chest pain (OR 1.47 per SD; 2.16 present vs absent), ST depression (1.42 per SD), exercise angina (1.35 per SD; 1.86 present vs absent) and male sex (1.32 per SD; 1.97 male vs female) raise the odds of disease, while atypical angina and a higher peak heart rate lower them. Two missing indicators rank near the top, for cholesterol (OR 1.57) and <code>ca</code> (1.46). Section&nbsp;4.6.4 shows that these are <b>hospital proxies</b>, not medical effects: within a hospital, a missing cholesterol value says nothing about disease (CMH <i>p</i> = 0.57). Permutation importance (Figure&nbsp;18) is model-agnostic and ranks chest-pain type first for all three models (&Delta;AUC 0.037&ndash;0.067). LR and the SVM produce almost identical rankings (Spearman &rho; = 0.98). RF agrees less (&rho; = 0.64&ndash;0.71) and ranks sex and thal higher and <code>ca</code> much lower. RF's impurity importance (Appendix Figure&nbsp;A2) also puts chest pain first. However, impurity importance is known to favour continuous features with many split points [15], so I treat permutation importance as the more reliable measure. The permutation importances were computed on only 184 test patients, and all importance measures share credit between correlated features, so the exact ranks beyond the top few are uncertain.</p>
+
+
+<figure>
+  <img class="w90" src="../figures/exp_model_lr_coefficients.png" alt="Logistic regression coefficients">
+  <figcaption><b>Figure 17:</b> The 20 largest standardised logistic-regression coefficients (change in log-odds per one-SD increase), with the corresponding odds ratios (OR). Red raises the odds of disease, blue lowers them.</figcaption>
+</figure>
+
+<figure>
+  <img class="w90" src="../figures/exp_model_permutation_importance.png" alt="Permutation importance">
+  <figcaption><b>Figure 18:</b> Permutation importance on the test set: the drop in ROC-AUC when one raw feature (including its missing indicator and one-hot columns) is randomly shuffled, averaged over 30 repetitions (&plusmn;1 SD).</figcaption>
+</figure>
+
+<h4>4.6.6&nbsp;&nbsp;Choosing a decision threshold for screening</h4>
+
+<figure>
+  <img src="../figures/exp_model_threshold.png" alt="Threshold analysis">
+  <figcaption><b>Figure 19:</b> Top: sensitivity, specificity and precision against the decision threshold, from out-of-fold predictions on the training set. Bottom: expected cost per patient when a missed disease costs 5&times; a false alarm. Vertical lines mark the default threshold (0.5), the lowest threshold reaching 90% sensitivity, and the cost-minimising threshold.</figcaption>
+</figure>
+
+<p>For screening, a missed diagnosis is worse than an extra test. Using the curves in Figure&nbsp;19, I chose thresholds using only out-of-fold predictions on the training set and then applied them unchanged to the test set (Table&nbsp;9). Requiring at least 90% sensitivity gives thresholds of 0.41&ndash;0.43, and this target transferred to the test set (91.2&ndash;92.2% sensitivity). With a cost ratio of 5:1, decision theory predicts an optimal threshold of \(t^*=\frac{c_{FP}}{c_{FP}+c_{FN}}=\frac16\approx0.17\) for perfectly calibrated probabilities [23]. The empirical cost minima (0.20&ndash;0.21) are close, which is a sign of reasonable calibration. At these thresholds the models catch 97&ndash;98% of diseased test patients and cut the expected cost by 20&ndash;38% relative to 0.5, but specificity falls to 0.44&ndash;0.56. The choice of threshold is therefore a clinical decision, not a statistical one. The 90%-sensitivity rule is a balanced compromise.</p>
+
+<div class="tbl">
+<div class="cap"><b>Table 9:</b> Test-set results at thresholds chosen on out-of-fold training predictions (sensitivity / specificity; missed diseases FN / false alarms FP; expected cost per patient with \(c_{FN}=5,\ c_{FP}=1\)).</div>
+<table class="small">
+<thead><tr><th>Model</th><th>Rule</th><th>Threshold</th><th>Sens. / Spec.</th><th>FN / FP</th><th>Cost</th></tr></thead>
+<tbody>
+<tr><td rowspan="3">Logistic Regression</td><td>default</td><td>0.500</td><td>0.873 / 0.793</td><td>13 / 17</td><td>0.446</td></tr>
+<tr><td>sensitivity &ge; 0.90</td><td>0.409</td><td>0.912 / 0.744</td><td>9 / 21</td><td>0.359</td></tr>
+<tr><td>minimum cost</td><td>0.204</td><td>0.980 / 0.500</td><td>2 / 41</td><td class="best">0.277</td></tr>
+<tr class="mid"><td rowspan="3">SVM (RBF)</td><td>default</td><td>0.500</td><td>0.912 / 0.768</td><td>9 / 19</td><td>0.348</td></tr>
+<tr><td>sensitivity &ge; 0.90</td><td>0.411</td><td>0.922 / 0.744</td><td>8 / 21</td><td>0.332</td></tr>
+<tr><td>minimum cost</td><td>0.202</td><td>0.971 / 0.561</td><td>3 / 36</td><td class="best">0.277</td></tr>
+<tr class="mid"><td rowspan="3">Random Forest</td><td>default</td><td>0.500</td><td>0.892 / 0.780</td><td>11 / 18</td><td>0.397</td></tr>
+<tr><td>sensitivity &ge; 0.90</td><td>0.434</td><td>0.922 / 0.695</td><td>8 / 25</td><td>0.353</td></tr>
+<tr><td>minimum cost</td><td>0.211</td><td>0.980 / 0.439</td><td>2 / 46</td><td>0.304</td></tr>
+</tbody>
+</table>
+</div>
+
+<h4>4.6.7&nbsp;&nbsp;Are the predicted probabilities trustworthy? (calibration)</h4>
+
+<figure>
+  <img src="../figures/exp_model_calibration.png" alt="Calibration">
+  <figcaption><b>Figure 20:</b> (a) Reliability diagram on the test set (8 quantile bins) with Brier scores. (b) Distribution of predicted probabilities. Random-forest probabilities are pulled towards the middle.</figcaption>
+</figure>
+
+<p>A risk score is only useful if &ldquo;70%&rdquo; means roughly 70%. LR and the SVM are well calibrated, with a Brier score of 0.115 each against 0.247 for always predicting the prevalence. The Platt-scaled SVM has the smallest expected calibration error (0.031). RF has a worse Brier score (0.127), and its reliability curve is S-shaped (Figure&nbsp;20): it is under-confident at both ends, with a calibration slope of 1.43, because averaging many trees pulls probabilities away from 0 and 1. This is a known property of bagged trees [18]. It means RF's probabilities would need recalibration before being shown to a clinician, even though its ranking (AUC) is almost as good.</p>
+
+<h4>4.6.8&nbsp;&nbsp;Which patients are misclassified? (error analysis)</h4>
+
+<figure>
+  <img src="../figures/exp_model_error_analysis.png" alt="Error analysis">
+  <figcaption><b>Figure 21:</b> (a) Test-set misclassification rate by hospital and model. (b) Mean predicted probability for each test patient, grouped by how many of the three models misclassify that patient.</figcaption>
+</figure>
+
+<p>The three models make largely the <em>same</em> mistakes (Figure&nbsp;21). Of the 184 test patients, 149 are classified correctly by all models, 12 by some, and 23 (12.5%) are misclassified by all three. These 23 shared errors are mostly <b>confident false positives</b> (15 FP, 8 FN; mean |<i>p</i>&minus;0.5| = 0.22). They are disproportionately Hungarian (47.8% vs 31.5% of the test set) and often have non-anginal chest pain, a pattern the features cannot separate from true disease. The 12 patients on which the models disagree are borderline cases (<i>p</i> &asymp; 0.5), half of them from Long Beach, with more missing values (3.2 on average). Hungary (19&ndash;21%) and, for LR and RF, Long Beach (20%) have the highest error rates, against 10&ndash;13% for Cleveland; the SVM's Long Beach error rate is only 12.5%. Because the errors are shared, combining the three models in an ensemble would gain little. Reducing these errors would require information the data set does not contain.</p>
+
+<h4>4.6.9&nbsp;&nbsp;Comparison with the Cleveland benchmark</h4>
+<p>To relate my results to the many studies that use only Cleveland, I ran the same pipelines with 5&times;10 CV on the 303 Cleveland patients (no new tuning; this is a benchmark only, so it includes the Cleveland test-split patients). Accuracy is 0.853 (LR), 0.838 (SVM) and 0.838 (RF), with AUC 0.904&ndash;0.913, against 0.541 for the majority class. This is higher than on the pooled data and above the early results documented for this subset (74.8&ndash;78.9% [1, 19]). The pooled four-hospital task is genuinely harder than the familiar benchmark, mostly because of the missing data and the differences between hospitals.</p>
+
+<h3>4.7&nbsp;&nbsp;Potential Improvements</h3>
+<ul>
+  <li><b>Site-aware recalibration.</b> LOSO showed that predicted probabilities shift with the training hospitals' prevalence. Re-estimating the intercept, or the threshold, on a small sample from a new hospital could reduce the accuracy loss without retraining the model [24]; I did not test this here.</li>
+  <li><b>Better missing-data handling.</b> Multiple imputation, or models that handle missing values natively (e.g. gradient-boosted trees), could use the within-site information in <code>slope</code> while reducing reliance on hospital-revealing gaps.</li>
+  <li><b>Features and data.</b> The curves show that the models are limited by the information in the features, not by capacity, and that more patients from the same hospitals would add little. The 62 unused raw attributes of the original databases are the most promising direction, and data from more hospitals would mainly help transfer to new sites.</li>
+  <li><b>Domain-robust training.</b> Grouped (by-hospital) cross-validation for tuning would select hyperparameters for transfer rather than for within-hospital accuracy.</li>
+</ul>
+
+<!-- ======================= 5 CONCLUSIONS ======================= -->
+<h2 id="sec-conclusion">5&nbsp;&nbsp;Conclusions</h2>
+
+<h3>5.1&nbsp;&nbsp;Concluding Remarks</h3>
+<p>I built a complete machine-learning pipeline to predict angiographic heart disease from 13 clinical attributes using all four cohorts of the UCI Heart Disease data. With a leakage-free preprocessing pipeline that keeps every patient, a tuned logistic regression, RBF SVM and random forest all reach a test ROC-AUC of 0.90&ndash;0.91 and an accuracy of 0.84&ndash;0.85, against 0.55 for the majority class. The three models are statistically indistinguishable, so the simplest one, logistic regression, is my recommended model. It is the most interpretable, well calibrated, the most stable under tuning, and the most accurate on average at an unseen hospital. The supporting experiments show three things. Performance is limited by the information in the features, not by model capacity. Missing values are largely a fingerprint of the hospital that models exploit as a shortcut. And a random train/test split overstates performance at a new hospital: per-hospital AUC falls by 0.06&ndash;0.09 (excluding Switzerland), and accuracy at the 0.5 threshold also suffers because predicted probabilities follow the training hospitals' prevalence.</p>
+
+<h3>5.2&nbsp;&nbsp;What I Learned</h3>
+<ul>
+  <li><b>Data understanding comes before modelling.</b> The most consequential decisions in this project were about data, not algorithms: recognising that cholesterol = 0 means &ldquo;not measured&rdquo; (which flipped the sign of an effect), and that missingness depends on the hospital. Three very different algorithms ended within 0.015 AUC of each other, while preprocessing choices moved the SVM by 0.22 AUC.</li>
+  <li><b>Validation design determines what a number means.</b> The same model scores a pooled AUC of 0.91 under a random split but averages 0.81 per held-out hospital. Both are &ldquo;correct&rdquo;, but they answer different questions. I learned to put all preprocessing inside the CV loop, to use nested CV to measure tuning optimism, and to use corrected statistical tests before claiming that one model beats another.</li>
+  <li><b>Simple models are hard to beat on small tabular data.</b> The bias&ndash;variance trade-off from lectures became concrete in the learning and validation curves: the random forest fit the training set far better but generalised no better than logistic regression.</li>
+  <li><b>Accuracy is not the whole story.</b> Threshold choice, calibration and error analysis changed how I would deploy the model more than the choice of algorithm did.</li>
+</ul>
+
+<h3>5.3&nbsp;&nbsp;Challenges and How I Overcame Them</h3>
+<ul>
+  <li><b>Hidden and structured missing values.</b> Placeholder zeros and hospital-specific gaps would have biased the model or, with complete-case deletion, thrown away 68% of the data. I audited every feature by hospital, recoded impossible values, and designed an imputation strategy with indicators that I then validated against two alternatives in an ablation study.</li>
+  <li><b>Misleading statistics.</b> My first test of whether missingness predicts disease gave tiny <i>p</i>-values for cholesterol, <code>ca</code>, fasting blood sugar and <code>slope</code>. I realised the test was confounded by hospital, and switched to a Cochran&ndash;Mantel&ndash;Haenszel test stratified by site, which showed that only the <code>slope</code> gap has a strong within-hospital association (<i>p</i> = 3.1&times;10<sup>&minus;18</sup>; the others have <i>p</i> &ge; 0.026). Similarly, I widened a correlation heat-map whose clipped colour scale made moderate correlations look extreme.</li>
+  <li><b>Library changes.</b> scikit-learn 1.9 deprecates the <code>penalty</code> argument of logistic regression and the <code>probability</code> option of SVC. I rewrote the L1/L2 search with <code>l1_ratio</code> and obtained SVM probabilities through explicit Platt scaling with <code>CalibratedClassifierCV</code>, which also made the calibration step visible in the method.</li>
+  <li><b>Slow experiments.</b> Running parallel random forests inside parallel grid searches oversubscribed the CPU. I restricted parallelism to the outer loop and cached the tuned hyperparameters, so the full analysis reruns in about 4 minutes.</li>
+  <li><b>Small-sample uncertainty.</b> With 184 test patients, differences of 1&ndash;2 points are noise. I reported bootstrap confidence intervals, repeated and nested CV, and corrected paired tests instead of ranking models by point estimates.</li>
+</ul>
+
+<h3>5.4&nbsp;&nbsp;Future Work</h3>
+<p>The most valuable next steps are to recalibrate the model on a small local sample before using it at a new hospital, to compare multiple imputation with the indicator approach, and to tune hyperparameters with hospital-grouped cross-validation so that model selection rewards transfer across sites.</p>
+
+<!-- ======================= REFERENCES ======================= -->
+<h2>References</h2>
+<ol class="refs">
+  <li>Janosi, A., Steinbrunn, W., Pfisterer, M., &amp; Detrano, R. (1989). <i>Heart Disease</i> [Dataset]. UCI Machine Learning Repository. https://doi.org/10.24432/C52P4X</li>
+  <li>Detrano, R., Janosi, A., Steinbrunn, W., Pfisterer, M., Schmid, J.-J., Sandhu, S., Guppy, K. H., Lee, S., &amp; Froelicher, V. (1989). International application of a new probability algorithm for the diagnosis of coronary artery disease. <i>The American Journal of Cardiology, 64</i>(5), 304&ndash;310.</li>
+  <li>World Health Organization. (2025, July 31). <i>Cardiovascular diseases (CVDs)</i> [Fact sheet]. https://www.who.int/news-room/fact-sheets/detail/cardiovascular-diseases-(cvds)</li>
+  <li>Pedregosa, F., Varoquaux, G., Gramfort, A., et al. (2011). Scikit-learn: Machine learning in Python. <i>Journal of Machine Learning Research, 12</i>, 2825&ndash;2830.</li>
+  <li>Breiman, L. (2001). Random forests. <i>Machine Learning, 45</i>(1), 5&ndash;32.</li>
+  <li>Cortes, C., &amp; Vapnik, V. (1995). Support-vector networks. <i>Machine Learning, 20</i>(3), 273&ndash;297.</li>
+  <li>Platt, J. C. (2000). Probabilistic outputs for support vector machines and comparisons to regularized likelihood methods. In A. J. Smola, P. L. Bartlett, B. Sch&ouml;lkopf, &amp; D. Schuurmans (Eds.), <i>Advances in Large Margin Classifiers</i> (pp. 61&ndash;74). MIT Press.</li>
+  <li>Hastie, T., Tibshirani, R., &amp; Friedman, J. (2009). <i>The Elements of Statistical Learning</i> (2nd ed.). Springer.</li>
+  <li>Nadeau, C., &amp; Bengio, Y. (2003). Inference for the generalization error. <i>Machine Learning, 52</i>(3), 239&ndash;281.</li>
+  <li>McNemar, Q. (1947). Note on the sampling error of the difference between correlated proportions or percentages. <i>Psychometrika, 12</i>(2), 153&ndash;157.</li>
+  <li>DeLong, E. R., DeLong, D. M., &amp; Clarke-Pearson, D. L. (1988). Comparing the areas under two or more correlated receiver operating characteristic curves: A nonparametric approach. <i>Biometrics, 44</i>(3), 837&ndash;845.</li>
+  <li>Varma, S., &amp; Simon, R. (2006). Bias in error estimation when using cross-validation for model selection. <i>BMC Bioinformatics, 7</i>, 91.</li>
+  <li>Zech, J. R., Badgeley, M. A., Liu, M., Costa, A. B., Titano, J. J., &amp; Oermann, E. K. (2018). Variable generalization performance of a deep learning model to detect pneumonia in chest radiographs: A cross-sectional study. <i>PLOS Medicine, 15</i>(11), e1002683.</li>
+  <li>Geirhos, R., Jacobsen, J.-H., Michaelis, C., Zemel, R., Brendel, W., Bethge, M., &amp; Wichmann, F. A. (2020). Shortcut learning in deep neural networks. <i>Nature Machine Intelligence, 2</i>(11), 665&ndash;673.</li>
+  <li>Strobl, C., Boulesteix, A.-L., Zeileis, A., &amp; Hothorn, T. (2007). Bias in random forest variable importance measures: Illustrations, sources and a solution. <i>BMC Bioinformatics, 8</i>, 25.</li>
+  <li>Tibshirani, R. (1996). Regression shrinkage and selection via the lasso. <i>Journal of the Royal Statistical Society: Series B, 58</i>(1), 267&ndash;288.</li>
+  <li>Little, R. J. A., &amp; Rubin, D. B. (2019). <i>Statistical Analysis with Missing Data</i> (3rd ed.). Wiley.</li>
+  <li>Niculescu-Mizil, A., &amp; Caruana, R. (2005). Predicting good probabilities with supervised learning. In <i>Proceedings of the 22nd International Conference on Machine Learning</i> (pp. 625&ndash;632).</li>
+  <li>Gennari, J. H., Langley, P., &amp; Fisher, D. (1989). Models of incremental concept formation. <i>Artificial Intelligence, 40</i>(1&ndash;3), 11&ndash;61.</li>
+  <li>Fawcett, T. (2006). An introduction to ROC analysis. <i>Pattern Recognition Letters, 27</i>(8), 861&ndash;874.</li>
+  <li>Dietterich, T. G. (1998). Approximate statistical tests for comparing supervised classification learning algorithms. <i>Neural Computation, 10</i>(7), 1895&ndash;1923.</li>
+  <li>Holm, S. (1979). A simple sequentially rejective multiple test procedure. <i>Scandinavian Journal of Statistics, 6</i>(2), 65&ndash;70.</li>
+  <li>Elkan, C. (2001). The foundations of cost-sensitive learning. In <i>Proceedings of the 17th International Joint Conference on Artificial Intelligence</i> (pp. 973&ndash;978).</li>
+  <li>Steyerberg, E. W. (2019). <i>Clinical Prediction Models: A Practical Approach to Development, Validation, and Updating</i> (2nd ed.). Springer.</li>
+</ol>
+
+<!-- ======================= APPENDIX ======================= -->
+<h2>Appendix A&nbsp;&nbsp;Reproducibility and Additional Figures</h2>
+<h3>A.1&nbsp;&nbsp;Reproducibility</h3>
+<p>All code, data and outputs are organised as follows; <code>python run_all.py</code> regenerates every figure and number in this report (about 4 minutes).</p>
+<table class="small" style="margin:6px 0 10px 0">
+<thead><tr><th>Path</th><th style="text-align:left">Contents</th></tr></thead>
+<tbody>
+<tr><td><code>data/raw/</code></td><td style="text-align:left">The four processed UCI files and the dataset documentation</td></tr>
+<tr><td><code>src/data.py</code>, <code>src/preprocess.py</code></td><td style="text-align:left">Loading, cleaning, stratified split; preprocessing pipelines</td></tr>
+<tr><td><code>src/models.py</code>, <code>src/evaluation.py</code></td><td style="text-align:left">Model definitions, grids and tuning; metrics and bootstrap CIs</td></tr>
+<tr><td><code>src/eda.py</code></td><td style="text-align:left">Section 2: exploratory analysis, statistics, figures 1&ndash;7</td></tr>
+<tr><td><code>src/train_evaluate.py</code></td><td style="text-align:left">Sections 4.2&ndash;4.4: tuning, repeated and nested CV, test evaluation, statistical tests</td></tr>
+<tr><td><code>src/experiments_data.py</code></td><td style="text-align:left">Sections 4.6.2&ndash;4.6.4 and 4.6.9: ablation, leave-one-site-out, missingness, Cleveland benchmark</td></tr>
+<tr><td><code>src/experiments_model.py</code></td><td style="text-align:left">Sections 4.6.1 and 4.6.5&ndash;4.6.8: curves, importance, thresholds, calibration, errors</td></tr>
+<tr><td><code>figures/</code>, <code>results/</code></td><td style="text-align:left">All figures (PNG, 300 dpi) and every reported number (CSV/JSON)</td></tr>
+</tbody>
+</table>
+
+<h3>A.2&nbsp;&nbsp;Additional Figures</h3>
+<figure>
+  <img src="../figures/results_test_metrics.png" alt="Test metrics with confidence intervals">
+  <figcaption><b>Figure A1:</b> Test-set metrics for each model and the majority baseline with 95% bootstrap confidence intervals (2,000 resamples).</figcaption>
+</figure>
+<figure>
+  <img src="../figures/exp_model_rf_importance.png" alt="Random forest impurity importance">
+  <figcaption><b>Figure A2:</b> Random-forest impurity importance: (a) the 15 most important encoded columns; (b) importance summed per original feature, including its missing indicator and one-hot levels.</figcaption>
+</figure>
+<figure>
+  <img class="w60" src="../figures/exp_data_loso_calibration.png" alt="LOSO calibration in the large">
+  <figcaption><b>Figure A3:</b> Leave-one-site-out calibration-in-the-large: on each held-out hospital, the mean predicted probability of each model compared with the observed prevalence (black) and the prevalence of the three training hospitals (dashed). In 9 of the 12 model&ndash;hospital cases, the mean prediction is closer to the training hospitals' prevalence than to the new hospital's.</figcaption>
+</figure>
+
+</body>
+</html>
