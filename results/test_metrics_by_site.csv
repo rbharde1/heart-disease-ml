@@ -1,0 +1,17 @@
+model,site,n,n_disease,n_no_disease,prevalence,accuracy,recall,specificity,roc_auc
+Logistic Regression,Cleveland,61,28,33,0.459,0.8852,0.9286,0.8485,0.961
+Logistic Regression,Hungary,58,21,37,0.3621,0.7931,0.7619,0.8108,0.8301
+Logistic Regression,Switzerland,25,23,2,0.92,0.88,0.9565,0.0,0.4565
+Logistic Regression,Long Beach VA,40,30,10,0.75,0.8,0.8333,0.7,0.9133
+SVM (RBF),Cleveland,61,28,33,0.459,0.8689,0.9286,0.8182,0.96
+SVM (RBF),Hungary,58,21,37,0.3621,0.7931,0.7619,0.8108,0.8391
+SVM (RBF),Switzerland,25,23,2,0.92,0.88,0.9565,0.0,0.5652
+SVM (RBF),Long Beach VA,40,30,10,0.75,0.875,0.9667,0.6,0.88
+Random Forest,Cleveland,61,28,33,0.459,0.9016,0.9643,0.8485,0.947
+Random Forest,Hungary,58,21,37,0.3621,0.8103,0.7619,0.8378,0.843
+Random Forest,Switzerland,25,23,2,0.92,0.84,0.913,0.0,0.6739
+Random Forest,Long Beach VA,40,30,10,0.75,0.8,0.9,0.5,0.9
+Majority baseline,Cleveland,61,28,33,0.459,0.459,1.0,0.0,0.5
+Majority baseline,Hungary,58,21,37,0.3621,0.3621,1.0,0.0,0.5
+Majority baseline,Switzerland,25,23,2,0.92,0.92,1.0,0.0,0.5
+Majority baseline,Long Beach VA,40,30,10,0.75,0.75,1.0,0.0,0.5

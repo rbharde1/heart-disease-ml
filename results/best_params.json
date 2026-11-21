@@ -1,0 +1,15 @@
+{
+  "Logistic Regression": {
+    "clf__C": 0.1,
+    "clf__l1_ratio": 0.0
+  },
+  "SVM (RBF)": {
+    "clf__estimator__C": 5,
+    "clf__estimator__gamma": 0.01
+  },
+  "Random Forest": {
+    "clf__max_depth": null,
+    "clf__max_features": "sqrt",
+    "clf__min_samples_leaf": 5
+  }
+}
