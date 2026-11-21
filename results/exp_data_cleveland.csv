@@ -1,0 +1,5 @@
+model,n_rows,roc_auc_mean,roc_auc_std,accuracy_mean,accuracy_std,f1_mean,f1_std
+Logistic Regression,303,0.9119,0.0334,0.8528,0.0469,0.8313,0.0565
+SVM (RBF),303,0.9045,0.0343,0.8376,0.0418,0.8134,0.0507
+Random Forest,303,0.9129,0.0316,0.8377,0.0517,0.8156,0.06
+Majority baseline,303,0.5,0.0,0.5413,0.0053,0.0,0.0

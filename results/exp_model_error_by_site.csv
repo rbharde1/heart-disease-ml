@@ -1,0 +1,5 @@
+site,n_test,pct_disease,pct_wrong_by_all_3,error_rate_LR,error_rate_SVM,error_rate_RF
+Cleveland,61,45.9016,8.1967,11.4754,13.1148,9.8361
+Hungary,58,36.2069,18.9655,20.6897,20.6897,18.9655
+Switzerland,25,92.0,12.0,12.0,12.0,16.0
+Long Beach VA,40,75.0,10.0,20.0,12.5,20.0

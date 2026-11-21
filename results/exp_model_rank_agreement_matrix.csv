@@ -1,0 +1,6 @@
+,LR |coef| (sum per feature),RF impurity (sum per feature),Permutation LR,Permutation SVM,Permutation RF
+LR |coef| (sum per feature),1.0,0.489,0.9066,0.8956,0.5714
+RF impurity (sum per feature),0.489,1.0,0.5824,0.6099,0.5934
+Permutation LR,0.9066,0.5824,1.0,0.9835,0.6429
+Permutation SVM,0.8956,0.6099,0.9835,1.0,0.7143
+Permutation RF,0.5714,0.5934,0.6429,0.7143,1.0

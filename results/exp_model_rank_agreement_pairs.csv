@@ -1,0 +1,11 @@
+a,b,spearman_rho,p_value
+LR |coef| (sum per feature),RF impurity (sum per feature),0.489,0.08991308230865641
+LR |coef| (sum per feature),Permutation LR,0.9066,1.9296152005272247e-05
+LR |coef| (sum per feature),Permutation SVM,0.8956,3.4809729944820894e-05
+LR |coef| (sum per feature),Permutation RF,0.5714,0.0413422673717235
+RF impurity (sum per feature),Permutation LR,0.5824,0.0367413343586543
+RF impurity (sum per feature),Permutation SVM,0.6099,0.02687783442125201
+RF impurity (sum per feature),Permutation RF,0.5934,0.03252444027009706
+Permutation LR,Permutation SVM,0.9835,1.6112145732095236e-09
+Permutation LR,Permutation RF,0.6429,0.017792450692375714
+Permutation SVM,Permutation RF,0.7143,0.006088305245824156

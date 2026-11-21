@@ -1,0 +1,9 @@
+task,model,accuracy_mean,accuracy_std,balanced_accuracy_mean,balanced_accuracy_std,recall_Cleveland,recall_Hungary,recall_Switzerland,recall_Long Beach VA,roc_auc_mean,roc_auc_std
+site_from_flags,Majority site,0.3288,0.003,0.25,0.0,,,,,,
+site_from_flags,Logistic Regression,0.851,0.0233,0.8341,0.0268,0.9876,0.9364,0.9592,0.4375,,
+site_from_flags,Decision tree (depth 4),0.8419,0.0252,0.8266,0.0277,0.9835,0.9195,0.9694,0.4188,,
+target_from_flags,Missing flags (LR),0.6907,0.0365,,,,,,,0.7543,0.0263
+target_from_flags,Missing flags (tree),0.6948,0.0264,,,,,,,0.7551,0.0246
+target_from_flags,Hospital only (LR),0.6698,0.0304,,,,,,,0.7198,0.028
+target_from_flags,Missing flags + hospital (LR),0.712,0.0296,,,,,,,0.7795,0.0267
+target_from_flags,"All 13 features (tuned LR, reference)",0.8125,0.0227,,,,,,,0.8973,0.0252

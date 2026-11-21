@@ -1,0 +1,40 @@
+model,feature,label,importance_mean,importance_std
+Logistic Regression,age,Age (years),0.0009,0.0022
+Logistic Regression,trestbps,Resting blood pressure (mm Hg),0.0041,0.0024
+Logistic Regression,chol,Serum cholesterol (mg/dl),0.0207,0.0104
+Logistic Regression,thalach,Max heart rate achieved (bpm),0.0085,0.0046
+Logistic Regression,oldpeak,ST depression (oldpeak),0.0175,0.0057
+Logistic Regression,ca,Major vessels coloured (0-3),0.021,0.01
+Logistic Regression,sex,Sex,0.0083,0.0055
+Logistic Regression,fbs,Fasting blood sugar > 120 mg/dl,0.0013,0.0006
+Logistic Regression,exang,Exercise-induced angina,0.0085,0.0047
+Logistic Regression,cp,Chest pain type,0.0444,0.0101
+Logistic Regression,restecg,Resting ECG,-0.0013,0.0014
+Logistic Regression,slope,Slope of peak exercise ST,0.0076,0.0078
+Logistic Regression,thal,Thallium stress test,0.0115,0.0052
+SVM (RBF),age,Age (years),0.0029,0.0032
+SVM (RBF),trestbps,Resting blood pressure (mm Hg),0.0032,0.0023
+SVM (RBF),chol,Serum cholesterol (mg/dl),0.0243,0.0095
+SVM (RBF),thalach,Max heart rate achieved (bpm),0.0088,0.0048
+SVM (RBF),oldpeak,ST depression (oldpeak),0.0195,0.0068
+SVM (RBF),ca,Major vessels coloured (0-3),0.0239,0.0109
+SVM (RBF),sex,Sex,0.0095,0.0063
+SVM (RBF),fbs,Fasting blood sugar > 120 mg/dl,0.0022,0.001
+SVM (RBF),exang,Exercise-induced angina,0.011,0.0053
+SVM (RBF),cp,Chest pain type,0.0371,0.0075
+SVM (RBF),restecg,Resting ECG,-0.0028,0.0016
+SVM (RBF),slope,Slope of peak exercise ST,0.0076,0.0065
+SVM (RBF),thal,Thallium stress test,0.013,0.006
+Random Forest,age,Age (years),0.0038,0.004
+Random Forest,trestbps,Resting blood pressure (mm Hg),0.0024,0.0022
+Random Forest,chol,Serum cholesterol (mg/dl),0.0105,0.0077
+Random Forest,thalach,Max heart rate achieved (bpm),0.0087,0.0057
+Random Forest,oldpeak,ST depression (oldpeak),0.0092,0.0056
+Random Forest,ca,Major vessels coloured (0-3),0.003,0.0017
+Random Forest,sex,Sex,0.0112,0.0062
+Random Forest,fbs,Fasting blood sugar > 120 mg/dl,0.0022,0.0008
+Random Forest,exang,Exercise-induced angina,0.0026,0.0074
+Random Forest,cp,Chest pain type,0.0666,0.0156
+Random Forest,restecg,Resting ECG,-0.0004,0.0012
+Random Forest,slope,Slope of peak exercise ST,0.0082,0.0076
+Random Forest,thal,Thallium stress test,0.0106,0.0058

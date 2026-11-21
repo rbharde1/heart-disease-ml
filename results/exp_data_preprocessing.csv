@@ -1,0 +1,16 @@
+setting,label,model,n_rows,roc_auc_mean,roc_auc_std,accuracy_mean,accuracy_std,roc_auc_delta_vs_default,accuracy_delta_vs_default
+indicator,Indicators + scaling (default),Logistic Regression,736,0.8973,0.0252,0.8125,0.0227,0.0,0.0
+indicator,Indicators + scaling (default),SVM (RBF),736,0.8984,0.0246,0.8238,0.0185,0.0,0.0
+indicator,Indicators + scaling (default),Random Forest,736,0.8914,0.0291,0.822,0.0306,0.0,0.0
+simple,Imputation only,Logistic Regression,736,0.8769,0.031,0.7949,0.035,-0.0204,-0.0177
+simple,Imputation only,SVM (RBF),736,0.8781,0.031,0.7967,0.0354,-0.0203,-0.0272
+simple,Imputation only,Random Forest,736,0.8804,0.0316,0.798,0.0411,-0.011,-0.024
+drop_sparse,"Drop ca, slope, thal",Logistic Regression,736,0.8709,0.0343,0.7813,0.0366,-0.0264,-0.0313
+drop_sparse,"Drop ca, slope, thal",SVM (RBF),736,0.8709,0.0327,0.7844,0.0318,-0.0276,-0.0394
+drop_sparse,"Drop ca, slope, thal",Random Forest,736,0.872,0.0325,0.7908,0.0336,-0.0194,-0.0313
+indicator_noscale,"Indicators, no scaling",Logistic Regression,736,0.8935,0.0264,0.8148,0.0263,-0.0038,0.0022
+indicator_noscale,"Indicators, no scaling",SVM (RBF),736,0.6802,0.0293,0.6169,0.0296,-0.2182,-0.2069
+indicator_noscale,"Indicators, no scaling",Random Forest,736,0.8913,0.0291,0.8211,0.0313,-0.0001,-0.0009
+complete_case,,Logistic Regression,239,0.9009,0.0436,0.8287,0.0548,,
+complete_case,,SVM (RBF),239,0.8932,0.0425,0.816,0.0531,,
+complete_case,,Random Forest,239,0.8963,0.0459,0.8078,0.0546,,

@@ -1,0 +1,31 @@
+encoded_feature,label,raw_feature,impurity_importance
+cp_4.0,Chest pain type: Asymptomatic,cp,0.1599
+exang,Exercise-induced angina,exang,0.1036
+thalach,Max heart rate achieved (bpm),thalach,0.0899
+oldpeak,ST depression (oldpeak),oldpeak,0.0892
+cp_2.0,Chest pain type: Atypical angina,cp,0.0875
+age,Age (years),age,0.0655
+chol,Serum cholesterol (mg/dl),chol,0.0488
+slope_2.0,Slope of peak exercise ST: Flat,slope,0.0443
+thal_3.0,Thallium stress test: Normal,thal,0.0432
+missingindicator_chol,Serum cholesterol missing,chol,0.0409
+sex,Male sex,sex,0.0406
+trestbps,Resting blood pressure (mm Hg),trestbps,0.0336
+cp_3.0,Chest pain type: Non-anginal pain,cp,0.0239
+slope_-1.0,Slope of peak exercise ST: missing,slope,0.0237
+thal_7.0,Thallium stress test: Reversible defect,thal,0.0207
+ca,Major vessels coloured (0-3),ca,0.0127
+slope_1.0,Slope of peak exercise ST: Upsloping,slope,0.0098
+restecg_0.0,Resting ECG: Normal,restecg,0.0097
+thal_-1.0,Thallium stress test: missing,thal,0.0096
+missingindicator_ca,Major vessels coloured missing,ca,0.0091
+fbs,Fasting blood sugar > 120 mg/dl,fbs,0.0054
+restecg_1.0,Resting ECG: ST-T abnormality,restecg,0.005
+restecg_2.0,Resting ECG: LV hypertrophy,restecg,0.0048
+cp_1.0,Chest pain type: Typical angina,cp,0.0047
+missingindicator_trestbps,Resting blood pressure missing,trestbps,0.0041
+missingindicator_oldpeak,ST depression missing,oldpeak,0.0039
+missingindicator_thalach,Max heart rate achieved missing,thalach,0.0037
+slope_3.0,Slope of peak exercise ST: Downsloping,slope,0.0014
+thal_6.0,Thallium stress test: Fixed defect,thal,0.0008
+restecg_-1.0,Resting ECG: missing,restecg,0.0

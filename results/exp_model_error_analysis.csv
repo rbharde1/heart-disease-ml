@@ -1,0 +1,19 @@
+characteristic,Wrong by all 3,Wrong by 1-2,Wrong by none,All test patients
+n_patients,23.0,12.0,149.0,184.0
+pct_of_test_set,12.5,6.5217,80.9783,100.0
+pct_true_disease,34.7826,50.0,59.0604,55.4348
+mean_age,57.6957,60.25,53.5839,54.5326
+pct_male,73.913,83.3333,77.1812,77.1739
+mean_missing_features,2.2174,3.1667,1.9732,2.0815
+pct_with_3plus_missing,39.1304,66.6667,37.5839,39.6739
+mean_predicted_prob,0.5596,0.5045,0.5642,0.5598
+mean_abs_prob_minus_0.5,0.2222,0.0389,0.3279,0.2958
+pct_site_Cleveland,21.7391,33.3333,34.8993,33.1522
+pct_site_Hungary,47.8261,8.3333,30.8725,31.5217
+pct_site_Switzerland,13.0435,8.3333,14.094,13.587
+pct_site_Long Beach VA,17.3913,50.0,20.1342,21.7391
+pct_cp_Typical angina,4.3478,8.3333,4.698,4.8913
+pct_cp_Atypical angina,8.6957,8.3333,22.1477,19.5652
+pct_cp_Non-anginal pain,39.1304,58.3333,17.4497,22.8261
+pct_cp_Asymptomatic,47.8261,25.0,55.7047,52.7174
+pct_exercise_angina,21.7391,25.0,36.9128,34.2391

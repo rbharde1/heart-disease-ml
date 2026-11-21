@@ -1,0 +1,871 @@
+{
+  "setup": {
+    "n_train": 736,
+    "n_test": 184,
+    "curve_cv": "5-fold stratified x 3 repeats",
+    "best_params": {
+      "Logistic Regression": {
+        "clf__C": 0.1,
+        "clf__l1_ratio": 0.0
+      },
+      "SVM (RBF)": {
+        "clf__estimator__C": 5,
+        "clf__estimator__gamma": 0.01
+      },
+      "Random Forest": {
+        "clf__max_depth": null,
+        "clf__max_features": "sqrt",
+        "clf__min_samples_leaf": 5
+      }
+    }
+  },
+  "m1_learning_curves": {
+    "Logistic Regression": {
+      "n_train_max": 588,
+      "train_auc_at_max": 0.9104,
+      "cv_auc_at_max": 0.8974,
+      "cv_auc_std_at_max": 0.0244,
+      "train_cv_gap_at_max": 0.013,
+      "n_train_smallest": 58,
+      "cv_auc_at_smallest": 0.8547,
+      "cv_auc_at_50pct": 0.8908,
+      "cv_auc_gain_50_to_100pct": 0.0066
+    },
+    "SVM (RBF)": {
+      "n_train_max": 588,
+      "train_auc_at_max": 0.9222,
+      "cv_auc_at_max": 0.8986,
+      "cv_auc_std_at_max": 0.0238,
+      "train_cv_gap_at_max": 0.0236,
+      "n_train_smallest": 58,
+      "cv_auc_at_smallest": 0.8584,
+      "cv_auc_at_50pct": 0.889,
+      "cv_auc_gain_50_to_100pct": 0.0096
+    },
+    "Random Forest": {
+      "n_train_max": 588,
+      "train_auc_at_max": 0.9584,
+      "cv_auc_at_max": 0.8914,
+      "cv_auc_std_at_max": 0.0275,
+      "train_cv_gap_at_max": 0.067,
+      "n_train_smallest": 58,
+      "cv_auc_at_smallest": 0.8579,
+      "cv_auc_at_50pct": 0.8818,
+      "cv_auc_gain_50_to_100pct": 0.0095
+    }
+  },
+  "m2_validation_curves": {
+    "lr_C": {
+      "model": "Logistic Regression",
+      "parameter": "clf__C",
+      "cv_best_value": 0.3,
+      "cv_best_auc": 0.8976,
+      "tuned_value": 0.1,
+      "cv_auc_at_tuned": 0.8973,
+      "train_auc_at_tuned": 0.9105,
+      "cv_auc_min": 0.8716,
+      "value_at_cv_min": 0.0001,
+      "cv_auc_range": 0.026
+    },
+    "svm_C": {
+      "model": "SVM (RBF)",
+      "parameter": "clf__estimator__C",
+      "cv_best_value": 5,
+      "cv_best_auc": 0.8984,
+      "tuned_value": 5,
+      "cv_auc_at_tuned": 0.8984,
+      "train_auc_at_tuned": 0.9222,
+      "cv_auc_min": 0.854,
+      "value_at_cv_min": 1000,
+      "cv_auc_range": 0.0445
+    },
+    "svm_gamma": {
+      "model": "SVM (RBF)",
+      "parameter": "clf__estimator__gamma",
+      "cv_best_value": 0.01,
+      "cv_best_auc": 0.8984,
+      "tuned_value": 0.01,
+      "cv_auc_at_tuned": 0.8984,
+      "train_auc_at_tuned": 0.9222,
+      "cv_auc_min": 0.7957,
+      "value_at_cv_min": 3,
+      "cv_auc_range": 0.1028
+    },
+    "rf_depth": {
+      "model": "Random Forest",
+      "parameter": "clf__max_depth",
+      "cv_best_value": 5,
+      "cv_best_auc": 0.8921,
+      "tuned_value": "None",
+      "cv_auc_at_tuned": 0.8914,
+      "train_auc_at_tuned": 0.9585,
+      "cv_auc_min": 0.8721,
+      "value_at_cv_min": 1,
+      "cv_auc_range": 0.0199
+    },
+    "rf_trees": {
+      "model": "Random Forest",
+      "parameter": "clf__n_estimators",
+      "cv_best_value": 100,
+      "cv_best_auc": 0.8923,
+      "tuned_value": 500,
+      "cv_auc_at_tuned": 0.8914,
+      "train_auc_at_tuned": 0.9585,
+      "cv_auc_min": 0.8156,
+      "value_at_cv_min": 1,
+      "cv_auc_range": 0.0767
+    }
+  },
+  "m3_feature_importance": {
+    "lr_top10_std_coefficients": [
+      {
+        "label": "Major vessels coloured (0-3)",
+        "coefficient": 0.5182,
+        "std_coefficient": 0.5182,
+        "odds_ratio_per_unit": 1.679,
+        "odds_ratio_per_sd": 1.679
+      },
+      {
+        "label": "Serum cholesterol missing",
+        "coefficient": 0.4509,
+        "std_coefficient": 0.4509,
+        "odds_ratio_per_unit": 1.5697,
+        "odds_ratio_per_sd": 1.5697
+      },
+      {
+        "label": "Chest pain type: Asymptomatic",
+        "coefficient": 0.7715,
+        "std_coefficient": 0.3844,
+        "odds_ratio_per_unit": 2.1629,
+        "odds_ratio_per_sd": 1.4687
+      },
+      {
+        "label": "Major vessels coloured missing",
+        "coefficient": 0.3807,
+        "std_coefficient": 0.3807,
+        "odds_ratio_per_unit": 1.4633,
+        "odds_ratio_per_sd": 1.4633
+      },
+      {
+        "label": "ST depression (oldpeak)",
+        "coefficient": 0.3501,
+        "std_coefficient": 0.3501,
+        "odds_ratio_per_unit": 1.4192,
+        "odds_ratio_per_sd": 1.4192
+      },
+      {
+        "label": "Exercise-induced angina",
+        "coefficient": 0.6188,
+        "std_coefficient": 0.2991,
+        "odds_ratio_per_unit": 1.8566,
+        "odds_ratio_per_sd": 1.3487
+      },
+      {
+        "label": "Chest pain type: Atypical angina",
+        "coefficient": -0.7284,
+        "std_coefficient": -0.2843,
+        "odds_ratio_per_unit": 0.4827,
+        "odds_ratio_per_sd": 0.7525
+      },
+      {
+        "label": "Male sex",
+        "coefficient": 0.6796,
+        "std_coefficient": 0.2751,
+        "odds_ratio_per_unit": 1.973,
+        "odds_ratio_per_sd": 1.3167
+      },
+      {
+        "label": "Max heart rate achieved (bpm)",
+        "coefficient": -0.2712,
+        "std_coefficient": -0.2712,
+        "odds_ratio_per_unit": 0.7625,
+        "odds_ratio_per_sd": 0.7625
+      },
+      {
+        "label": "Slope of peak exercise ST: Flat",
+        "coefficient": 0.4273,
+        "std_coefficient": 0.2072,
+        "odds_ratio_per_unit": 1.5331,
+        "odds_ratio_per_sd": 1.2302
+      }
+    ],
+    "rf_top10_impurity": [
+      {
+        "label": "Chest pain type: Asymptomatic",
+        "impurity_importance": 0.1599
+      },
+      {
+        "label": "Exercise-induced angina",
+        "impurity_importance": 0.1036
+      },
+      {
+        "label": "Max heart rate achieved (bpm)",
+        "impurity_importance": 0.0899
+      },
+      {
+        "label": "ST depression (oldpeak)",
+        "impurity_importance": 0.0892
+      },
+      {
+        "label": "Chest pain type: Atypical angina",
+        "impurity_importance": 0.0875
+      },
+      {
+        "label": "Age (years)",
+        "impurity_importance": 0.0655
+      },
+      {
+        "label": "Serum cholesterol (mg/dl)",
+        "impurity_importance": 0.0488
+      },
+      {
+        "label": "Slope of peak exercise ST: Flat",
+        "impurity_importance": 0.0443
+      },
+      {
+        "label": "Thallium stress test: Normal",
+        "impurity_importance": 0.0432
+      },
+      {
+        "label": "Serum cholesterol missing",
+        "impurity_importance": 0.0409
+      }
+    ],
+    "rf_impurity_by_feature": {
+      "cp": 0.276,
+      "exang": 0.1036,
+      "thalach": 0.0936,
+      "oldpeak": 0.093,
+      "chol": 0.0897,
+      "slope": 0.0792,
+      "thal": 0.0743,
+      "age": 0.0655,
+      "sex": 0.0406,
+      "trestbps": 0.0378,
+      "ca": 0.0218,
+      "restecg": 0.0195,
+      "fbs": 0.0054
+    },
+    "permutation_top5_features": {
+      "Logistic Regression": [
+        "cp",
+        "ca",
+        "chol",
+        "oldpeak",
+        "thal"
+      ],
+      "SVM (RBF)": [
+        "cp",
+        "chol",
+        "ca",
+        "oldpeak",
+        "thal"
+      ],
+      "Random Forest": [
+        "cp",
+        "sex",
+        "thal",
+        "chol",
+        "oldpeak"
+      ]
+    },
+    "permutation_importance": {
+      "Logistic Regression": {
+        "cp": {
+          "importance_mean": 0.0444,
+          "importance_std": 0.0101
+        },
+        "ca": {
+          "importance_mean": 0.021,
+          "importance_std": 0.01
+        },
+        "chol": {
+          "importance_mean": 0.0207,
+          "importance_std": 0.0104
+        },
+        "oldpeak": {
+          "importance_mean": 0.0175,
+          "importance_std": 0.0057
+        },
+        "thal": {
+          "importance_mean": 0.0115,
+          "importance_std": 0.0052
+        },
+        "exang": {
+          "importance_mean": 0.0085,
+          "importance_std": 0.0047
+        },
+        "thalach": {
+          "importance_mean": 0.0085,
+          "importance_std": 0.0046
+        },
+        "sex": {
+          "importance_mean": 0.0083,
+          "importance_std": 0.0055
+        },
+        "slope": {
+          "importance_mean": 0.0076,
+          "importance_std": 0.0078
+        },
+        "trestbps": {
+          "importance_mean": 0.0041,
+          "importance_std": 0.0024
+        },
+        "fbs": {
+          "importance_mean": 0.0013,
+          "importance_std": 0.0006
+        },
+        "age": {
+          "importance_mean": 0.0009,
+          "importance_std": 0.0022
+        },
+        "restecg": {
+          "importance_mean": -0.0013,
+          "importance_std": 0.0014
+        }
+      },
+      "SVM (RBF)": {
+        "cp": {
+          "importance_mean": 0.0371,
+          "importance_std": 0.0075
+        },
+        "chol": {
+          "importance_mean": 0.0243,
+          "importance_std": 0.0095
+        },
+        "ca": {
+          "importance_mean": 0.0239,
+          "importance_std": 0.0109
+        },
+        "oldpeak": {
+          "importance_mean": 0.0195,
+          "importance_std": 0.0068
+        },
+        "thal": {
+          "importance_mean": 0.013,
+          "importance_std": 0.006
+        },
+        "exang": {
+          "importance_mean": 0.011,
+          "importance_std": 0.0053
+        },
+        "sex": {
+          "importance_mean": 0.0095,
+          "importance_std": 0.0063
+        },
+        "thalach": {
+          "importance_mean": 0.0088,
+          "importance_std": 0.0048
+        },
+        "slope": {
+          "importance_mean": 0.0076,
+          "importance_std": 0.0065
+        },
+        "trestbps": {
+          "importance_mean": 0.0032,
+          "importance_std": 0.0023
+        },
+        "age": {
+          "importance_mean": 0.0029,
+          "importance_std": 0.0032
+        },
+        "fbs": {
+          "importance_mean": 0.0022,
+          "importance_std": 0.001
+        },
+        "restecg": {
+          "importance_mean": -0.0028,
+          "importance_std": 0.0016
+        }
+      },
+      "Random Forest": {
+        "cp": {
+          "importance_mean": 0.0666,
+          "importance_std": 0.0156
+        },
+        "sex": {
+          "importance_mean": 0.0112,
+          "importance_std": 0.0062
+        },
+        "thal": {
+          "importance_mean": 0.0106,
+          "importance_std": 0.0058
+        },
+        "chol": {
+          "importance_mean": 0.0105,
+          "importance_std": 0.0077
+        },
+        "oldpeak": {
+          "importance_mean": 0.0092,
+          "importance_std": 0.0056
+        },
+        "thalach": {
+          "importance_mean": 0.0087,
+          "importance_std": 0.0057
+        },
+        "slope": {
+          "importance_mean": 0.0082,
+          "importance_std": 0.0076
+        },
+        "age": {
+          "importance_mean": 0.0038,
+          "importance_std": 0.004
+        },
+        "ca": {
+          "importance_mean": 0.003,
+          "importance_std": 0.0017
+        },
+        "exang": {
+          "importance_mean": 0.0026,
+          "importance_std": 0.0074
+        },
+        "trestbps": {
+          "importance_mean": 0.0024,
+          "importance_std": 0.0022
+        },
+        "fbs": {
+          "importance_mean": 0.0022,
+          "importance_std": 0.0008
+        },
+        "restecg": {
+          "importance_mean": -0.0004,
+          "importance_std": 0.0012
+        }
+      }
+    },
+    "spearman_pairs": [
+      {
+        "a": "LR |coef| (sum per feature)",
+        "b": "RF impurity (sum per feature)",
+        "spearman_rho": 0.489,
+        "p_value": 0.0899
+      },
+      {
+        "a": "LR |coef| (sum per feature)",
+        "b": "Permutation LR",
+        "spearman_rho": 0.9066,
+        "p_value": 1.93e-05
+      },
+      {
+        "a": "LR |coef| (sum per feature)",
+        "b": "Permutation SVM",
+        "spearman_rho": 0.8956,
+        "p_value": 3.48e-05
+      },
+      {
+        "a": "LR |coef| (sum per feature)",
+        "b": "Permutation RF",
+        "spearman_rho": 0.5714,
+        "p_value": 0.0413
+      },
+      {
+        "a": "RF impurity (sum per feature)",
+        "b": "Permutation LR",
+        "spearman_rho": 0.5824,
+        "p_value": 0.0367
+      },
+      {
+        "a": "RF impurity (sum per feature)",
+        "b": "Permutation SVM",
+        "spearman_rho": 0.6099,
+        "p_value": 0.0269
+      },
+      {
+        "a": "RF impurity (sum per feature)",
+        "b": "Permutation RF",
+        "spearman_rho": 0.5934,
+        "p_value": 0.0325
+      },
+      {
+        "a": "Permutation LR",
+        "b": "Permutation SVM",
+        "spearman_rho": 0.9835,
+        "p_value": 1.61e-09
+      },
+      {
+        "a": "Permutation LR",
+        "b": "Permutation RF",
+        "spearman_rho": 0.6429,
+        "p_value": 0.0178
+      },
+      {
+        "a": "Permutation SVM",
+        "b": "Permutation RF",
+        "spearman_rho": 0.7143,
+        "p_value": 0.00609
+      }
+    ],
+    "train_chol_missingness": {
+      "n_missing": 163,
+      "disease_rate_if_missing": 0.8037,
+      "disease_rate_if_observed": 0.4817
+    }
+  },
+  "m4_threshold": {
+    "cost_fn": 5.0,
+    "cost_fp": 1.0,
+    "target_sensitivity": 0.9,
+    "bayes_threshold_if_calibrated": 0.1667,
+    "rows": [
+      {
+        "model": "Logistic Regression",
+        "rule": "Default 0.5",
+        "threshold": 0.5,
+        "oof_sensitivity": 0.8378,
+        "oof_specificity": 0.7812,
+        "oof_cost_per_patient": 0.5462,
+        "test_accuracy": 0.837,
+        "test_precision": 0.8396,
+        "test_recall": 0.8725,
+        "test_specificity": 0.7927,
+        "test_f1": 0.8558,
+        "test_roc_auc": 0.9137,
+        "test_avg_precision": 0.9215,
+        "test_tn": 65,
+        "test_fp": 17,
+        "test_fn": 13,
+        "test_tp": 89,
+        "test_cost_per_patient": 0.4457
+      },
+      {
+        "model": "Logistic Regression",
+        "rule": "Sensitivity >= 0.90",
+        "threshold": 0.4093,
+        "oof_sensitivity": 0.9017,
+        "oof_specificity": 0.7173,
+        "oof_cost_per_patient": 0.3981,
+        "test_accuracy": 0.837,
+        "test_precision": 0.8158,
+        "test_recall": 0.9118,
+        "test_specificity": 0.7439,
+        "test_f1": 0.8611,
+        "test_roc_auc": 0.9137,
+        "test_avg_precision": 0.9215,
+        "test_tn": 61,
+        "test_fp": 21,
+        "test_fn": 9,
+        "test_tp": 93,
+        "test_cost_per_patient": 0.3587
+      },
+      {
+        "model": "Logistic Regression",
+        "rule": "Min cost (FN = 5 x FP)",
+        "threshold": 0.2041,
+        "oof_sensitivity": 0.9828,
+        "oof_specificity": 0.4954,
+        "oof_cost_per_patient": 0.2731,
+        "test_accuracy": 0.7663,
+        "test_precision": 0.7092,
+        "test_recall": 0.9804,
+        "test_specificity": 0.5,
+        "test_f1": 0.823,
+        "test_roc_auc": 0.9137,
+        "test_avg_precision": 0.9215,
+        "test_tn": 41,
+        "test_fp": 41,
+        "test_fn": 2,
+        "test_tp": 100,
+        "test_cost_per_patient": 0.2772
+      },
+      {
+        "model": "SVM (RBF)",
+        "rule": "Default 0.5",
+        "threshold": 0.5,
+        "oof_sensitivity": 0.855,
+        "oof_specificity": 0.7872,
+        "oof_cost_per_patient": 0.4959,
+        "test_accuracy": 0.8478,
+        "test_precision": 0.8304,
+        "test_recall": 0.9118,
+        "test_specificity": 0.7683,
+        "test_f1": 0.8692,
+        "test_roc_auc": 0.9127,
+        "test_avg_precision": 0.9232,
+        "test_tn": 63,
+        "test_fp": 19,
+        "test_fn": 9,
+        "test_tp": 93,
+        "test_cost_per_patient": 0.3478
+      },
+      {
+        "model": "SVM (RBF)",
+        "rule": "Sensitivity >= 0.90",
+        "threshold": 0.4113,
+        "oof_sensitivity": 0.9017,
+        "oof_specificity": 0.7325,
+        "oof_cost_per_patient": 0.3913,
+        "test_accuracy": 0.8424,
+        "test_precision": 0.8174,
+        "test_recall": 0.9216,
+        "test_specificity": 0.7439,
+        "test_f1": 0.8664,
+        "test_roc_auc": 0.9127,
+        "test_avg_precision": 0.9232,
+        "test_tn": 61,
+        "test_fp": 21,
+        "test_fn": 8,
+        "test_tp": 94,
+        "test_cost_per_patient": 0.3315
+      },
+      {
+        "model": "SVM (RBF)",
+        "rule": "Min cost (FN = 5 x FP)",
+        "threshold": 0.2023,
+        "oof_sensitivity": 0.9656,
+        "oof_specificity": 0.5593,
+        "oof_cost_per_patient": 0.2921,
+        "test_accuracy": 0.788,
+        "test_precision": 0.7333,
+        "test_recall": 0.9706,
+        "test_specificity": 0.561,
+        "test_f1": 0.8354,
+        "test_roc_auc": 0.9127,
+        "test_avg_precision": 0.9232,
+        "test_tn": 46,
+        "test_fp": 36,
+        "test_fn": 3,
+        "test_tp": 99,
+        "test_cost_per_patient": 0.2772
+      },
+      {
+        "model": "Random Forest",
+        "rule": "Default 0.5",
+        "threshold": 0.5,
+        "oof_sensitivity": 0.8624,
+        "oof_specificity": 0.772,
+        "oof_cost_per_patient": 0.4823,
+        "test_accuracy": 0.8424,
+        "test_precision": 0.8349,
+        "test_recall": 0.8922,
+        "test_specificity": 0.7805,
+        "test_f1": 0.8626,
+        "test_roc_auc": 0.8997,
+        "test_avg_precision": 0.9074,
+        "test_tn": 64,
+        "test_fp": 18,
+        "test_fn": 11,
+        "test_tp": 91,
+        "test_cost_per_patient": 0.3967
+      },
+      {
+        "model": "Random Forest",
+        "rule": "Sensitivity >= 0.90",
+        "threshold": 0.4341,
+        "oof_sensitivity": 0.9017,
+        "oof_specificity": 0.6809,
+        "oof_cost_per_patient": 0.4144,
+        "test_accuracy": 0.8207,
+        "test_precision": 0.7899,
+        "test_recall": 0.9216,
+        "test_specificity": 0.6951,
+        "test_f1": 0.8507,
+        "test_roc_auc": 0.8997,
+        "test_avg_precision": 0.9074,
+        "test_tn": 57,
+        "test_fp": 25,
+        "test_fn": 8,
+        "test_tp": 94,
+        "test_cost_per_patient": 0.3533
+      },
+      {
+        "model": "Random Forest",
+        "rule": "Min cost (FN = 5 x FP)",
+        "threshold": 0.2106,
+        "oof_sensitivity": 0.9877,
+        "oof_specificity": 0.4134,
+        "oof_cost_per_patient": 0.2962,
+        "test_accuracy": 0.7391,
+        "test_precision": 0.6849,
+        "test_recall": 0.9804,
+        "test_specificity": 0.439,
+        "test_f1": 0.8065,
+        "test_roc_auc": 0.8997,
+        "test_avg_precision": 0.9074,
+        "test_tn": 36,
+        "test_fp": 46,
+        "test_fn": 2,
+        "test_tp": 100,
+        "test_cost_per_patient": 0.3043
+      }
+    ]
+  },
+  "m5_calibration": {
+    "Logistic Regression": {
+      "brier": 0.1155,
+      "brier_ci95_low": 0.0892,
+      "brier_ci95_high": 0.1435,
+      "ece_quantile_bins": 0.0563,
+      "max_bin_gap": 0.1159,
+      "calibration_slope": 1.2632,
+      "calibration_intercept": -0.16,
+      "mean_predicted": 0.5681,
+      "observed_rate": 0.5543,
+      "brier_skill_score": 0.5326,
+      "oof_train_brier": 0.1285
+    },
+    "SVM (RBF)": {
+      "brier": 0.1153,
+      "brier_ci95_low": 0.0868,
+      "brier_ci95_high": 0.1444,
+      "ece_quantile_bins": 0.0309,
+      "max_bin_gap": 0.0686,
+      "calibration_slope": 1.1217,
+      "calibration_intercept": -0.0909,
+      "mean_predicted": 0.5613,
+      "observed_rate": 0.5543,
+      "brier_skill_score": 0.5334,
+      "oof_train_brier": 0.1252
+    },
+    "Random Forest": {
+      "brier": 0.1274,
+      "brier_ci95_low": 0.1026,
+      "brier_ci95_high": 0.1535,
+      "ece_quantile_bins": 0.0773,
+      "max_bin_gap": 0.1534,
+      "calibration_slope": 1.4341,
+      "calibration_intercept": -0.0794,
+      "mean_predicted": 0.5499,
+      "observed_rate": 0.5543,
+      "brier_skill_score": 0.4845,
+      "oof_train_brier": 0.1354
+    },
+    "prevalence_only_reference": {
+      "brier": 0.247,
+      "train_prevalence": 0.553
+    }
+  },
+  "m6_error_analysis": {
+    "n_wrong_by_all_3": 23,
+    "all_3_false_negatives": 8,
+    "all_3_false_positives": 15,
+    "n_wrong_by_1_2": 12,
+    "n_wrong_by_none": 149,
+    "errors_per_model": {
+      "Logistic Regression": 30,
+      "SVM (RBF)": 28,
+      "Random Forest": 29
+    },
+    "pairwise_error_overlap": {
+      "LR&SVM": 26,
+      "LR&RF": 25,
+      "SVM&RF": 24
+    },
+    "group_summary": {
+      "Wrong by all 3": {
+        "n_patients": 23.0,
+        "pct_of_test_set": 12.5,
+        "pct_true_disease": 34.7826,
+        "mean_age": 57.6957,
+        "pct_male": 73.913,
+        "mean_missing_features": 2.2174,
+        "pct_with_3plus_missing": 39.1304,
+        "mean_predicted_prob": 0.5596,
+        "mean_abs_prob_minus_0.5": 0.2222,
+        "pct_site_Cleveland": 21.7391,
+        "pct_site_Hungary": 47.8261,
+        "pct_site_Switzerland": 13.0435,
+        "pct_site_Long Beach VA": 17.3913,
+        "pct_cp_Typical angina": 4.3478,
+        "pct_cp_Atypical angina": 8.6957,
+        "pct_cp_Non-anginal pain": 39.1304,
+        "pct_cp_Asymptomatic": 47.8261,
+        "pct_exercise_angina": 21.7391
+      },
+      "Wrong by 1-2": {
+        "n_patients": 12.0,
+        "pct_of_test_set": 6.5217,
+        "pct_true_disease": 50.0,
+        "mean_age": 60.25,
+        "pct_male": 83.3333,
+        "mean_missing_features": 3.1667,
+        "pct_with_3plus_missing": 66.6667,
+        "mean_predicted_prob": 0.5045,
+        "mean_abs_prob_minus_0.5": 0.0389,
+        "pct_site_Cleveland": 33.3333,
+        "pct_site_Hungary": 8.3333,
+        "pct_site_Switzerland": 8.3333,
+        "pct_site_Long Beach VA": 50.0,
+        "pct_cp_Typical angina": 8.3333,
+        "pct_cp_Atypical angina": 8.3333,
+        "pct_cp_Non-anginal pain": 58.3333,
+        "pct_cp_Asymptomatic": 25.0,
+        "pct_exercise_angina": 25.0
+      },
+      "Wrong by none": {
+        "n_patients": 149.0,
+        "pct_of_test_set": 80.9783,
+        "pct_true_disease": 59.0604,
+        "mean_age": 53.5839,
+        "pct_male": 77.1812,
+        "mean_missing_features": 1.9732,
+        "pct_with_3plus_missing": 37.5839,
+        "mean_predicted_prob": 0.5642,
+        "mean_abs_prob_minus_0.5": 0.3279,
+        "pct_site_Cleveland": 34.8993,
+        "pct_site_Hungary": 30.8725,
+        "pct_site_Switzerland": 14.094,
+        "pct_site_Long Beach VA": 20.1342,
+        "pct_cp_Typical angina": 4.698,
+        "pct_cp_Atypical angina": 22.1477,
+        "pct_cp_Non-anginal pain": 17.4497,
+        "pct_cp_Asymptomatic": 55.7047,
+        "pct_exercise_angina": 36.9128
+      },
+      "All test patients": {
+        "n_patients": 184.0,
+        "pct_of_test_set": 100.0,
+        "pct_true_disease": 55.4348,
+        "mean_age": 54.5326,
+        "pct_male": 77.1739,
+        "mean_missing_features": 2.0815,
+        "pct_with_3plus_missing": 39.6739,
+        "mean_predicted_prob": 0.5598,
+        "mean_abs_prob_minus_0.5": 0.2958,
+        "pct_site_Cleveland": 33.1522,
+        "pct_site_Hungary": 31.5217,
+        "pct_site_Switzerland": 13.587,
+        "pct_site_Long Beach VA": 21.7391,
+        "pct_cp_Typical angina": 4.8913,
+        "pct_cp_Atypical angina": 19.5652,
+        "pct_cp_Non-anginal pain": 22.8261,
+        "pct_cp_Asymptomatic": 52.7174,
+        "pct_exercise_angina": 34.2391
+      }
+    },
+    "by_site": {
+      "Cleveland": {
+        "n_test": 61,
+        "pct_disease": 45.9016,
+        "pct_wrong_by_all_3": 8.1967,
+        "error_rate_LR": 11.4754,
+        "error_rate_SVM": 13.1148,
+        "error_rate_RF": 9.8361
+      },
+      "Hungary": {
+        "n_test": 58,
+        "pct_disease": 36.2069,
+        "pct_wrong_by_all_3": 18.9655,
+        "error_rate_LR": 20.6897,
+        "error_rate_SVM": 20.6897,
+        "error_rate_RF": 18.9655
+      },
+      "Switzerland": {
+        "n_test": 25,
+        "pct_disease": 92.0,
+        "pct_wrong_by_all_3": 12.0,
+        "error_rate_LR": 12.0,
+        "error_rate_SVM": 12.0,
+        "error_rate_RF": 16.0
+      },
+      "Long Beach VA": {
+        "n_test": 40,
+        "pct_disease": 75.0,
+        "pct_wrong_by_all_3": 10.0,
+        "error_rate_LR": 20.0,
+        "error_rate_SVM": 12.5,
+        "error_rate_RF": 20.0
+      }
+    }
+  },
+  "runtime_seconds": 54.4609
+}
