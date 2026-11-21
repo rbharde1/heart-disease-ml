@@ -1,0 +1,14 @@
+feature,test,n,statistic,dof,p_value,effect_measure,effect_size,univariate_auc,summary_measure,no_disease,disease,direction,p_holm,magnitude,label
+cp,Chi-square,920,268.3,3.0,7.04e-58,Cramer's V,0.54,,% Asymptomatic,25.3%,77.0%,'Asymptomatic' has highest disease rate (79.0%),9.15e-57,large,Chest pain type
+thal,Chi-square,434,109.0,2.0,2.09e-24,Cramer's V,0.501,,% Reversible defect,20.3%,62.3%,'Reversible defect' has highest disease rate (80.2%),1.88e-23,large,Thallium stress test
+ca,Mann-Whitney U,309,17786.5,,1.87e-17,rank-biserial r,0.497,0.749,median [IQR],0 [0-0],1 [0-2],higher with disease,9.35e-17,medium,Major vessels coloured (0-3)
+exang,Chi-square,865,185.9,1.0,2.46e-42,Cramer's V,0.464,,% Yes,14.1%,59.5%,'Yes' has highest disease rate (83.7%),2.95e-41,medium,Exercise-induced angina
+thalach,Mann-Whitney U,865,49781.0,,9.03e-32,rank-biserial r,-0.463,0.269,median [IQR],151 [134.5-167.5],128 [112-145],lower with disease,9.36e-31,medium,Max heart rate achieved (bpm)
+oldpeak,Mann-Whitney U,858,131897.5,,8.51e-32,rank-biserial r,0.445,0.723,median [IQR],0 [0-0.8],1.05 [0-2],higher with disease,9.36e-31,medium,ST depression (oldpeak)
+slope,Chi-square,611,88.9,2.0,5.08e-20,Cramer's V,0.381,,% Downsloping,6.4%,12.5%,'Downsloping' has highest disease rate (77.8%),3.56e-19,medium,Slope of peak exercise ST
+age,Mann-Whitney U,920,139869.0,,1.29e-18,rank-biserial r,0.337,0.669,median [IQR],51 [43-57],57 [51-62],higher with disease,7.74e-18,medium,Age (years)
+sex,Chi-square,920,86.9,1.0,1.16e-20,Cramer's V,0.307,,% Male,65.0%,90.2%,'Male' has highest disease rate (63.2%),9.28e-20,medium,Sex
+chol,Mann-Whitney U,718,73772.5,,0.000697,rank-biserial r,0.146,0.573,median [IQR],233 [204-270.25],248 [216-284.75],higher with disease,0.00209,small,Serum cholesterol (mg/dl)
+fbs,Chi-square,830,16.9,1.0,4e-05,Cramer's V,0.143,,% Yes,11.1%,21.7%,'Yes' has highest disease rate (68.1%),0.00016,small,Fasting blood sugar > 120 mg/dl
+trestbps,Mann-Whitney U,860,103306.0,,0.0013,rank-biserial r,0.127,0.563,median [IQR],130 [120-140],130 [120-145],higher with disease,0.0026,small,Resting blood pressure (mm Hg)
+restecg,Chi-square,918,11.7,2.0,0.00286,Cramer's V,0.113,,% ST-T abnormality,14.8%,23.3%,'ST-T abnormality' has highest disease rate (65.9%),0.00286,small,Resting ECG

@@ -1,0 +1,6 @@
+Site,Patients,Complete (all 13 features),"Complete, all 13 (%)",Complete (without ca/slope/thal),"Complete, without ca/slope/thal (%)"
+Cleveland,303,297,98.0,303,100.0
+Hungary,294,1,0.3,261,88.8
+Switzerland,123,0,0.0,0,0.0
+Long Beach VA,200,1,0.5,97,48.5
+All sites,920,299,32.5,661,71.8

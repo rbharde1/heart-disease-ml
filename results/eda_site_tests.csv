@@ -1,0 +1,7 @@
+feature,test,sites_with_data,statistic,p_value,epsilon_squared,median_Cleveland,median_Hungary,median_Switzerland,median_Long Beach VA,cramers_v
+age,Kruskal-Wallis,4,202.1,1.5e-43,0.22,56.0,49.0,56.0,60.0,
+trestbps,Kruskal-Wallis,4,5.4,0.146,0.006,130.0,130.0,125.0,130.0,
+chol,Kruskal-Wallis,3,2.7,0.265,0.004,241.0,243.0,,228.0,
+thalach,Kruskal-Wallis,4,161.7,7.88e-35,0.187,153.0,140.0,121.0,120.0,
+oldpeak,Kruskal-Wallis,4,67.1,1.76e-14,0.078,0.8,0.0,0.3,1.5,
+target,Chi-square (site x target),4,157.4,6.73e-34,,,,,,0.414

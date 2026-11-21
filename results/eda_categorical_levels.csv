@@ -1,0 +1,30 @@
+feature,level_code,level,n,n_disease,disease_rate_pct,pct_of_no_disease,pct_of_disease
+sex,0.0,Female,194,50,25.8,35.0,9.8
+sex,1.0,Male,726,459,63.2,65.0,90.2
+cp,1.0,Typical angina,46,20,43.5,6.3,3.9
+cp,2.0,Atypical angina,174,24,13.8,36.5,4.7
+cp,3.0,Non-anginal pain,204,73,35.8,31.9,14.3
+cp,4.0,Asymptomatic,496,392,79.0,25.3,77.0
+exang,0.0,No,528,192,36.4,81.8,37.7
+exang,1.0,Yes,337,282,83.7,13.4,55.4
+exang,,Missing,55,35,63.6,4.9,6.9
+ca,0.0,0 vessels,181,48,26.5,32.4,9.4
+ca,1.0,1 vessel,67,46,68.7,5.1,9.0
+ca,2.0,2 vessels,41,33,80.5,1.9,6.5
+ca,3.0,3 vessels,20,17,85.0,0.7,3.3
+ca,,Missing,611,365,59.7,59.9,71.7
+fbs,0.0,No,692,339,49.0,85.9,66.6
+fbs,1.0,Yes,138,94,68.1,10.7,18.5
+fbs,,Missing,90,76,84.4,3.4,14.9
+restecg,0.0,Normal,551,283,51.4,65.2,55.6
+restecg,1.0,ST-T abnormality,179,118,65.9,14.8,23.2
+restecg,2.0,LV hypertrophy,188,106,56.4,20.0,20.8
+restecg,,Missing,2,2,100.0,0.0,0.4
+slope,1.0,Upsloping,203,78,38.4,30.4,15.3
+slope,2.0,Flat,345,266,77.1,19.2,52.3
+slope,3.0,Downsloping,63,49,77.8,3.4,9.6
+slope,,Missing,309,116,37.5,47.0,22.8
+thal,3.0,Normal,196,58,29.6,33.6,11.4
+thal,6.0,Fixed defect,46,35,76.1,2.7,6.9
+thal,7.0,Reversible defect,192,154,80.2,9.2,30.3
+thal,,Missing,486,262,53.9,54.5,51.5

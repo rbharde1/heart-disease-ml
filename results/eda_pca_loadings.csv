@@ -1,0 +1,31 @@
+,readable,PC1,PC2
+age,Age,0.0727,0.5031
+trestbps,Resting BP,-0.0191,0.2487
+chol,Cholesterol,-0.0301,0.1619
+thalach,Max heart rate,-0.0429,-0.2086
+oldpeak,ST depression,-0.1002,0.4217
+ca,Major vessels,-0.1672,0.4156
+missingindicator_trestbps,Resting BP: missing,0.5234,0.1408
+missingindicator_chol,Cholesterol: missing,0.0888,-0.0976
+missingindicator_thalach,Max heart rate: missing,0.5261,0.1405
+missingindicator_oldpeak,ST depression: missing,0.5195,0.1272
+missingindicator_ca,Major vessels: missing,0.255,-0.297
+sex,Sex (male),0.0358,0.0149
+fbs,Fasting blood sugar,0.0324,0.0582
+exang,Exercise angina,-0.0534,0.1106
+cp_1.0,Chest pain: Typical angina,-0.0003,0.0075
+cp_2.0,Chest pain: Atypical angina,-0.0026,-0.0897
+cp_3.0,Chest pain: Non-anginal pain,0.0147,-0.0214
+cp_4.0,Chest pain: Asymptomatic,-0.0118,0.1036
+restecg_-1.0,Resting ECG: missing,0.0,-0.002
+restecg_0.0,Resting ECG: Normal,-0.0214,-0.1011
+restecg_1.0,Resting ECG: ST-T abnormality,0.0689,0.0029
+restecg_2.0,Resting ECG: LV hypertrophy,-0.0475,0.1002
+slope_-1.0,ST slope: missing,0.1352,-0.1387
+slope_1.0,ST slope: Upsloping,-0.0543,-0.0024
+slope_2.0,ST slope: Flat,-0.071,0.1113
+slope_3.0,ST slope: Downsloping,-0.01,0.0298
+thal_-1.0,Thallium test: missing,0.1191,-0.1142
+thal_3.0,Thallium test: Normal,-0.0624,0.0114
+thal_6.0,Thallium test: Fixed defect,-0.0058,0.0023
+thal_7.0,Thallium test: Reversible defect,-0.0508,0.1006

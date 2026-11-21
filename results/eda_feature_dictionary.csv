@@ -1,0 +1,14 @@
+Feature,Name,Description,Type,Values / range,Missing (%),Treatment (default pipeline)
+age,Age (years),Age in years,Numeric (continuous),28 to 77,0.0,Standardised (no missing values)
+trestbps,Resting blood pressure (mm Hg),Resting blood pressure on admission (mm Hg),Numeric (continuous),80 to 200,6.5,"Median imputation + missing indicator, standardised"
+chol,Serum cholesterol (mg/dl),Serum cholesterol (mg/dl),Numeric (continuous),85 to 603,22.0,"Median imputation + missing indicator, standardised"
+thalach,Max heart rate achieved (bpm),Maximum heart rate achieved during exercise test (bpm),Numeric (continuous),60 to 202,6.0,"Median imputation + missing indicator, standardised"
+oldpeak,ST depression (oldpeak),ST depression induced by exercise relative to rest (mm),Numeric (continuous),-2.6 to 6.2,6.7,"Median imputation + missing indicator, standardised"
+ca,Major vessels coloured (0-3),Number of major vessels (0-3) coloured by fluoroscopy,Numeric (ordinal count),0-3,66.4,"Median imputation + missing indicator, standardised; dropped in 'drop_sparse'"
+sex,Sex,"Sex (1 = male, 0 = female)",Binary,"0 = Female, 1 = Male",0.0,Kept as 0/1 (no missing values)
+fbs,Fasting blood sugar > 120 mg/dl,Fasting blood sugar > 120 mg/dl (1 = true),Binary,"0 = No, 1 = Yes",9.8,"Mode imputation, kept as 0/1"
+exang,Exercise-induced angina,Exercise-induced angina (1 = yes),Binary,"0 = No, 1 = Yes",6.0,"Mode imputation, kept as 0/1"
+cp,Chest pain type,Chest pain type,Categorical (nominal),"1 = Typical angina, 2 = Atypical angina, 3 = Non-anginal pain, 4 = Asymptomatic",0.0,One-hot encoded; missing kept as its own level
+restecg,Resting ECG,Resting electrocardiogram result,Categorical (nominal),"0 = Normal, 1 = ST-T abnormality, 2 = LV hypertrophy",0.2,One-hot encoded; missing kept as its own level
+slope,Slope of peak exercise ST,Slope of the peak-exercise ST segment,Categorical (ordered levels),"1 = Upsloping, 2 = Flat, 3 = Downsloping",33.6,One-hot encoded; missing kept as its own level; dropped in 'drop_sparse'
+thal,Thallium stress test,Thallium stress test result,Categorical (nominal),"3 = Normal, 6 = Fixed defect, 7 = Reversible defect",52.8,One-hot encoded; missing kept as its own level; dropped in 'drop_sparse'

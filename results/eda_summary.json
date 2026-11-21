@@ -1,0 +1,1159 @@
+{
+  "n_patients": 920,
+  "n_features": 13,
+  "feature_groups": {
+    "numeric": [
+      "age",
+      "trestbps",
+      "chol",
+      "thalach",
+      "oldpeak",
+      "ca"
+    ],
+    "binary": [
+      "sex",
+      "fbs",
+      "exang"
+    ],
+    "categorical": [
+      "cp",
+      "restecg",
+      "slope",
+      "thal"
+    ]
+  },
+  "pooled_prevalence_pct": 55.3,
+  "class_counts": {
+    "disease": 509,
+    "no_disease": 411
+  },
+  "sites": {
+    "Cleveland": {
+      "n": 303,
+      "n_disease": 139,
+      "prevalence_pct": 45.9,
+      "share_of_data_pct": 32.9,
+      "median_age": 56.0,
+      "male_pct": 68.0
+    },
+    "Hungary": {
+      "n": 294,
+      "n_disease": 106,
+      "prevalence_pct": 36.1,
+      "share_of_data_pct": 32.0,
+      "median_age": 49.0,
+      "male_pct": 72.4
+    },
+    "Switzerland": {
+      "n": 123,
+      "n_disease": 115,
+      "prevalence_pct": 93.5,
+      "share_of_data_pct": 13.4,
+      "median_age": 56.0,
+      "male_pct": 91.9
+    },
+    "Long Beach VA": {
+      "n": 200,
+      "n_disease": 149,
+      "prevalence_pct": 74.5,
+      "share_of_data_pct": 21.7,
+      "median_age": 60.0,
+      "male_pct": 97.0
+    }
+  },
+  "num_distribution": {
+    "Cleveland": {
+      "num=0": 164,
+      "num=1": 55,
+      "num=2": 36,
+      "num=3": 35,
+      "num=4": 13
+    },
+    "Hungary": {
+      "num=0": 188,
+      "num=1": 106,
+      "num=2": 0,
+      "num=3": 0,
+      "num=4": 0
+    },
+    "Switzerland": {
+      "num=0": 8,
+      "num=1": 48,
+      "num=2": 32,
+      "num=3": 30,
+      "num=4": 5
+    },
+    "Long Beach VA": {
+      "num=0": 51,
+      "num=1": 56,
+      "num=2": 41,
+      "num=3": 42,
+      "num=4": 10
+    },
+    "All sites": {
+      "num=0": 411,
+      "num=1": 265,
+      "num=2": 109,
+      "num=3": 107,
+      "num=4": 28
+    }
+  },
+  "placeholder_zeros_in_raw_files": {
+    "chol": {
+      "total": 172,
+      "by_site": {
+        "Cleveland": 0,
+        "Hungary": 0,
+        "Switzerland": 123,
+        "Long Beach VA": 49
+      },
+      "disease_rate_among_zeros_pct": 88.4,
+      "rank_biserial_zeros_kept": -0.158,
+      "rank_biserial_zeros_as_missing": 0.146
+    },
+    "trestbps": {
+      "total": 1,
+      "by_site": {
+        "Cleveland": 0,
+        "Hungary": 0,
+        "Switzerland": 0,
+        "Long Beach VA": 1
+      },
+      "disease_rate_among_zeros_pct": 100.0
+    }
+  },
+  "duplicates": {
+    "exact_duplicate_rows": 2,
+    "rows_involved": 4,
+    "sites_of_duplicates": {
+      "Hungary": 2,
+      "Long Beach VA": 2
+    },
+    "duplicate_pairs_split_across_train_test": 1,
+    "action": "kept: identical records cannot be told apart from two patients with identical values, and 2 of 920 rows cannot change the conclusions"
+  },
+  "missing_pct_by_feature_and_site": {
+    "age": {
+      "Cleveland": 0.0,
+      "Hungary": 0.0,
+      "Switzerland": 0.0,
+      "Long Beach VA": 0.0,
+      "All sites": 0.0
+    },
+    "trestbps": {
+      "Cleveland": 0.0,
+      "Hungary": 0.3,
+      "Switzerland": 1.6,
+      "Long Beach VA": 28.5,
+      "All sites": 6.5
+    },
+    "chol": {
+      "Cleveland": 0.0,
+      "Hungary": 7.8,
+      "Switzerland": 100.0,
+      "Long Beach VA": 28.0,
+      "All sites": 22.0
+    },
+    "thalach": {
+      "Cleveland": 0.0,
+      "Hungary": 0.3,
+      "Switzerland": 0.8,
+      "Long Beach VA": 26.5,
+      "All sites": 6.0
+    },
+    "oldpeak": {
+      "Cleveland": 0.0,
+      "Hungary": 0.0,
+      "Switzerland": 4.9,
+      "Long Beach VA": 28.0,
+      "All sites": 6.7
+    },
+    "ca": {
+      "Cleveland": 1.3,
+      "Hungary": 99.0,
+      "Switzerland": 95.9,
+      "Long Beach VA": 99.0,
+      "All sites": 66.4
+    },
+    "sex": {
+      "Cleveland": 0.0,
+      "Hungary": 0.0,
+      "Switzerland": 0.0,
+      "Long Beach VA": 0.0,
+      "All sites": 0.0
+    },
+    "fbs": {
+      "Cleveland": 0.0,
+      "Hungary": 2.7,
+      "Switzerland": 61.0,
+      "Long Beach VA": 3.5,
+      "All sites": 9.8
+    },
+    "exang": {
+      "Cleveland": 0.0,
+      "Hungary": 0.3,
+      "Switzerland": 0.8,
+      "Long Beach VA": 26.5,
+      "All sites": 6.0
+    },
+    "cp": {
+      "Cleveland": 0.0,
+      "Hungary": 0.0,
+      "Switzerland": 0.0,
+      "Long Beach VA": 0.0,
+      "All sites": 0.0
+    },
+    "restecg": {
+      "Cleveland": 0.0,
+      "Hungary": 0.3,
+      "Switzerland": 0.8,
+      "Long Beach VA": 0.0,
+      "All sites": 0.2
+    },
+    "slope": {
+      "Cleveland": 0.0,
+      "Hungary": 64.6,
+      "Switzerland": 13.8,
+      "Long Beach VA": 51.0,
+      "All sites": 33.6
+    },
+    "thal": {
+      "Cleveland": 0.7,
+      "Hungary": 90.5,
+      "Switzerland": 42.3,
+      "Long Beach VA": 83.0,
+      "All sites": 52.8
+    }
+  },
+  "missing_cells_pct_overall": 16.2,
+  "features_without_missing": [
+    "age",
+    "sex",
+    "cp"
+  ],
+  "complete_case": {
+    "Cleveland": {
+      "Patients": 303,
+      "Complete (all 13 features)": 297,
+      "Complete, all 13 (%)": 98.0,
+      "Complete (without ca/slope/thal)": 303,
+      "Complete, without ca/slope/thal (%)": 100.0
+    },
+    "Hungary": {
+      "Patients": 294,
+      "Complete (all 13 features)": 1,
+      "Complete, all 13 (%)": 0.3,
+      "Complete (without ca/slope/thal)": 261,
+      "Complete, without ca/slope/thal (%)": 88.8
+    },
+    "Switzerland": {
+      "Patients": 123,
+      "Complete (all 13 features)": 0,
+      "Complete, all 13 (%)": 0.0,
+      "Complete (without ca/slope/thal)": 0,
+      "Complete, without ca/slope/thal (%)": 0.0
+    },
+    "Long Beach VA": {
+      "Patients": 200,
+      "Complete (all 13 features)": 1,
+      "Complete, all 13 (%)": 0.5,
+      "Complete (without ca/slope/thal)": 97,
+      "Complete, without ca/slope/thal (%)": 48.5
+    },
+    "All sites": {
+      "Patients": 920,
+      "Complete (all 13 features)": 299,
+      "Complete, all 13 (%)": 32.5,
+      "Complete (without ca/slope/thal)": 661,
+      "Complete, without ca/slope/thal (%)": 71.8
+    }
+  },
+  "missingness_vs_target": [
+    {
+      "feature": "trestbps",
+      "n_missing": 60,
+      "missing_pct": 6.5,
+      "disease_rate_if_missing_pct": 66.7,
+      "disease_rate_if_observed_pct": 54.5,
+      "expected_rate_from_site_pct": 74.5,
+      "chi2": 3.3,
+      "p_value": 0.0676,
+      "cmh_chi2_within_site": 2.7,
+      "cmh_p_value": 0.0997,
+      "share_of_missing_by_site_pct": {
+        "Cleveland": 0.0,
+        "Hungary": 1.7,
+        "Switzerland": 3.3,
+        "Long Beach VA": 95.0
+      }
+    },
+    {
+      "feature": "chol",
+      "n_missing": 202,
+      "missing_pct": 22.0,
+      "disease_rate_if_missing_pct": 80.7,
+      "disease_rate_if_observed_pct": 48.2,
+      "expected_rate_from_site_pct": 81.7,
+      "chi2": 67.4,
+      "p_value": 2.23e-16,
+      "cmh_chi2_within_site": 0.3,
+      "cmh_p_value": 0.571,
+      "share_of_missing_by_site_pct": {
+        "Cleveland": 0.0,
+        "Hungary": 11.4,
+        "Switzerland": 60.9,
+        "Long Beach VA": 27.7
+      }
+    },
+    {
+      "feature": "thalach",
+      "n_missing": 55,
+      "missing_pct": 6.0,
+      "disease_rate_if_missing_pct": 63.6,
+      "disease_rate_if_observed_pct": 54.8,
+      "expected_rate_from_site_pct": 74.1,
+      "chi2": 1.6,
+      "p_value": 0.201,
+      "cmh_chi2_within_site": 4.3,
+      "cmh_p_value": 0.0376,
+      "share_of_missing_by_site_pct": {
+        "Cleveland": 0.0,
+        "Hungary": 1.8,
+        "Switzerland": 1.8,
+        "Long Beach VA": 96.4
+      }
+    },
+    {
+      "feature": "oldpeak",
+      "n_missing": 62,
+      "missing_pct": 6.7,
+      "disease_rate_if_missing_pct": 66.1,
+      "disease_rate_if_observed_pct": 54.5,
+      "expected_rate_from_site_pct": 76.3,
+      "chi2": 3.1,
+      "p_value": 0.0764,
+      "cmh_chi2_within_site": 5.0,
+      "cmh_p_value": 0.0257,
+      "share_of_missing_by_site_pct": {
+        "Cleveland": 0.0,
+        "Hungary": 0.0,
+        "Switzerland": 9.7,
+        "Long Beach VA": 90.3
+      }
+    },
+    {
+      "feature": "ca",
+      "n_missing": 611,
+      "missing_pct": 66.4,
+      "disease_rate_if_missing_pct": 59.7,
+      "disease_rate_if_observed_pct": 46.6,
+      "expected_rate_from_site_pct": 59.7,
+      "chi2": 14.3,
+      "p_value": 0.000154,
+      "cmh_chi2_within_site": 0.1,
+      "cmh_p_value": 0.788,
+      "share_of_missing_by_site_pct": {
+        "Cleveland": 0.7,
+        "Hungary": 47.6,
+        "Switzerland": 19.3,
+        "Long Beach VA": 32.4
+      }
+    },
+    {
+      "feature": "fbs",
+      "n_missing": 90,
+      "missing_pct": 9.8,
+      "disease_rate_if_missing_pct": 84.4,
+      "disease_rate_if_observed_pct": 52.2,
+      "expected_rate_from_site_pct": 86.9,
+      "chi2": 34.2,
+      "p_value": 4.92e-09,
+      "cmh_chi2_within_site": 1.0,
+      "cmh_p_value": 0.315,
+      "share_of_missing_by_site_pct": {
+        "Cleveland": 0.0,
+        "Hungary": 8.9,
+        "Switzerland": 83.3,
+        "Long Beach VA": 7.8
+      }
+    },
+    {
+      "feature": "exang",
+      "n_missing": 55,
+      "missing_pct": 6.0,
+      "disease_rate_if_missing_pct": 63.6,
+      "disease_rate_if_observed_pct": 54.8,
+      "expected_rate_from_site_pct": 74.1,
+      "chi2": 1.6,
+      "p_value": 0.201,
+      "cmh_chi2_within_site": 4.3,
+      "cmh_p_value": 0.0376,
+      "share_of_missing_by_site_pct": {
+        "Cleveland": 0.0,
+        "Hungary": 1.8,
+        "Switzerland": 1.8,
+        "Long Beach VA": 96.4
+      }
+    },
+    {
+      "feature": "restecg",
+      "n_missing": 2,
+      "missing_pct": 0.2,
+      "disease_rate_if_missing_pct": 100.0,
+      "disease_rate_if_observed_pct": 55.2,
+      "expected_rate_from_site_pct": 64.8,
+      "chi2": 1.6,
+      "p_value": 0.203,
+      "cmh_chi2_within_site": 1.7,
+      "cmh_p_value": 0.192,
+      "share_of_missing_by_site_pct": {
+        "Cleveland": 0.0,
+        "Hungary": 50.0,
+        "Switzerland": 50.0,
+        "Long Beach VA": 0.0
+      }
+    },
+    {
+      "feature": "slope",
+      "n_missing": 309,
+      "missing_pct": 33.6,
+      "disease_rate_if_missing_pct": 37.5,
+      "disease_rate_if_observed_pct": 64.3,
+      "expected_rate_from_site_pct": 51.9,
+      "chi2": 59.5,
+      "p_value": 1.19e-14,
+      "cmh_chi2_within_site": 75.8,
+      "cmh_p_value": 3.12e-18,
+      "share_of_missing_by_site_pct": {
+        "Cleveland": 0.0,
+        "Hungary": 61.5,
+        "Switzerland": 5.5,
+        "Long Beach VA": 33.0
+      }
+    },
+    {
+      "feature": "thal",
+      "n_missing": 486,
+      "missing_pct": 52.8,
+      "disease_rate_if_missing_pct": 53.9,
+      "disease_rate_if_observed_pct": 56.9,
+      "expected_rate_from_site_pct": 55.4,
+      "chi2": 0.8,
+      "p_value": 0.36,
+      "cmh_chi2_within_site": 3.7,
+      "cmh_p_value": 0.0537,
+      "share_of_missing_by_site_pct": {
+        "Cleveland": 0.4,
+        "Hungary": 54.7,
+        "Switzerland": 10.7,
+        "Long Beach VA": 34.2
+      }
+    }
+  ],
+  "univariate_tests": [
+    {
+      "feature": "cp",
+      "test": "Chi-square",
+      "n": 920,
+      "statistic": 268.3,
+      "dof": 3.0,
+      "p_value": 7.04e-58,
+      "effect_measure": "Cramer's V",
+      "effect_size": 0.54,
+      "univariate_auc": null,
+      "summary_measure": "% Asymptomatic",
+      "no_disease": "25.3%",
+      "disease": "77.0%",
+      "direction": "'Asymptomatic' has highest disease rate (79.0%)",
+      "p_holm": 9.15e-57,
+      "magnitude": "large",
+      "label": "Chest pain type"
+    },
+    {
+      "feature": "thal",
+      "test": "Chi-square",
+      "n": 434,
+      "statistic": 109.0,
+      "dof": 2.0,
+      "p_value": 2.09e-24,
+      "effect_measure": "Cramer's V",
+      "effect_size": 0.501,
+      "univariate_auc": null,
+      "summary_measure": "% Reversible defect",
+      "no_disease": "20.3%",
+      "disease": "62.3%",
+      "direction": "'Reversible defect' has highest disease rate (80.2%)",
+      "p_holm": 1.88e-23,
+      "magnitude": "large",
+      "label": "Thallium stress test"
+    },
+    {
+      "feature": "ca",
+      "test": "Mann-Whitney U",
+      "n": 309,
+      "statistic": 17786.5,
+      "dof": null,
+      "p_value": 1.87e-17,
+      "effect_measure": "rank-biserial r",
+      "effect_size": 0.497,
+      "univariate_auc": 0.749,
+      "summary_measure": "median [IQR]",
+      "no_disease": "0 [0-0]",
+      "disease": "1 [0-2]",
+      "direction": "higher with disease",
+      "p_holm": 9.35e-17,
+      "magnitude": "medium",
+      "label": "Major vessels coloured (0-3)"
+    },
+    {
+      "feature": "exang",
+      "test": "Chi-square",
+      "n": 865,
+      "statistic": 185.9,
+      "dof": 1.0,
+      "p_value": 2.46e-42,
+      "effect_measure": "Cramer's V",
+      "effect_size": 0.464,
+      "univariate_auc": null,
+      "summary_measure": "% Yes",
+      "no_disease": "14.1%",
+      "disease": "59.5%",
+      "direction": "'Yes' has highest disease rate (83.7%)",
+      "p_holm": 2.95e-41,
+      "magnitude": "medium",
+      "label": "Exercise-induced angina"
+    },
+    {
+      "feature": "thalach",
+      "test": "Mann-Whitney U",
+      "n": 865,
+      "statistic": 49781.0,
+      "dof": null,
+      "p_value": 9.03e-32,
+      "effect_measure": "rank-biserial r",
+      "effect_size": -0.463,
+      "univariate_auc": 0.269,
+      "summary_measure": "median [IQR]",
+      "no_disease": "151 [134.5-167.5]",
+      "disease": "128 [112-145]",
+      "direction": "lower with disease",
+      "p_holm": 9.36e-31,
+      "magnitude": "medium",
+      "label": "Max heart rate achieved (bpm)"
+    },
+    {
+      "feature": "oldpeak",
+      "test": "Mann-Whitney U",
+      "n": 858,
+      "statistic": 131897.5,
+      "dof": null,
+      "p_value": 8.51e-32,
+      "effect_measure": "rank-biserial r",
+      "effect_size": 0.445,
+      "univariate_auc": 0.723,
+      "summary_measure": "median [IQR]",
+      "no_disease": "0 [0-0.8]",
+      "disease": "1.05 [0-2]",
+      "direction": "higher with disease",
+      "p_holm": 9.36e-31,
+      "magnitude": "medium",
+      "label": "ST depression (oldpeak)"
+    },
+    {
+      "feature": "slope",
+      "test": "Chi-square",
+      "n": 611,
+      "statistic": 88.9,
+      "dof": 2.0,
+      "p_value": 5.08e-20,
+      "effect_measure": "Cramer's V",
+      "effect_size": 0.381,
+      "univariate_auc": null,
+      "summary_measure": "% Downsloping",
+      "no_disease": "6.4%",
+      "disease": "12.5%",
+      "direction": "'Downsloping' has highest disease rate (77.8%)",
+      "p_holm": 3.56e-19,
+      "magnitude": "medium",
+      "label": "Slope of peak exercise ST"
+    },
+    {
+      "feature": "age",
+      "test": "Mann-Whitney U",
+      "n": 920,
+      "statistic": 139869.0,
+      "dof": null,
+      "p_value": 1.29e-18,
+      "effect_measure": "rank-biserial r",
+      "effect_size": 0.337,
+      "univariate_auc": 0.669,
+      "summary_measure": "median [IQR]",
+      "no_disease": "51 [43-57]",
+      "disease": "57 [51-62]",
+      "direction": "higher with disease",
+      "p_holm": 7.74e-18,
+      "magnitude": "medium",
+      "label": "Age (years)"
+    },
+    {
+      "feature": "sex",
+      "test": "Chi-square",
+      "n": 920,
+      "statistic": 86.9,
+      "dof": 1.0,
+      "p_value": 1.16e-20,
+      "effect_measure": "Cramer's V",
+      "effect_size": 0.307,
+      "univariate_auc": null,
+      "summary_measure": "% Male",
+      "no_disease": "65.0%",
+      "disease": "90.2%",
+      "direction": "'Male' has highest disease rate (63.2%)",
+      "p_holm": 9.28e-20,
+      "magnitude": "medium",
+      "label": "Sex"
+    },
+    {
+      "feature": "chol",
+      "test": "Mann-Whitney U",
+      "n": 718,
+      "statistic": 73772.5,
+      "dof": null,
+      "p_value": 0.000697,
+      "effect_measure": "rank-biserial r",
+      "effect_size": 0.146,
+      "univariate_auc": 0.573,
+      "summary_measure": "median [IQR]",
+      "no_disease": "233 [204-270.25]",
+      "disease": "248 [216-284.75]",
+      "direction": "higher with disease",
+      "p_holm": 0.00209,
+      "magnitude": "small",
+      "label": "Serum cholesterol (mg/dl)"
+    },
+    {
+      "feature": "fbs",
+      "test": "Chi-square",
+      "n": 830,
+      "statistic": 16.9,
+      "dof": 1.0,
+      "p_value": 4e-05,
+      "effect_measure": "Cramer's V",
+      "effect_size": 0.143,
+      "univariate_auc": null,
+      "summary_measure": "% Yes",
+      "no_disease": "11.1%",
+      "disease": "21.7%",
+      "direction": "'Yes' has highest disease rate (68.1%)",
+      "p_holm": 0.00016,
+      "magnitude": "small",
+      "label": "Fasting blood sugar > 120 mg/dl"
+    },
+    {
+      "feature": "trestbps",
+      "test": "Mann-Whitney U",
+      "n": 860,
+      "statistic": 103306.0,
+      "dof": null,
+      "p_value": 0.0013,
+      "effect_measure": "rank-biserial r",
+      "effect_size": 0.127,
+      "univariate_auc": 0.563,
+      "summary_measure": "median [IQR]",
+      "no_disease": "130 [120-140]",
+      "disease": "130 [120-145]",
+      "direction": "higher with disease",
+      "p_holm": 0.0026,
+      "magnitude": "small",
+      "label": "Resting blood pressure (mm Hg)"
+    },
+    {
+      "feature": "restecg",
+      "test": "Chi-square",
+      "n": 918,
+      "statistic": 11.7,
+      "dof": 2.0,
+      "p_value": 0.00286,
+      "effect_measure": "Cramer's V",
+      "effect_size": 0.113,
+      "univariate_auc": null,
+      "summary_measure": "% ST-T abnormality",
+      "no_disease": "14.8%",
+      "disease": "23.3%",
+      "direction": "'ST-T abnormality' has highest disease rate (65.9%)",
+      "p_holm": 0.00286,
+      "magnitude": "small",
+      "label": "Resting ECG"
+    }
+  ],
+  "strongest_associations": [
+    {
+      "feature": "cp",
+      "test": "Chi-square",
+      "effect_measure": "Cramer's V",
+      "effect_size": 0.54,
+      "p_holm": 9.15e-57,
+      "direction": "'Asymptomatic' has highest disease rate (79.0%)"
+    },
+    {
+      "feature": "thal",
+      "test": "Chi-square",
+      "effect_measure": "Cramer's V",
+      "effect_size": 0.501,
+      "p_holm": 1.88e-23,
+      "direction": "'Reversible defect' has highest disease rate (80.2%)"
+    },
+    {
+      "feature": "ca",
+      "test": "Mann-Whitney U",
+      "effect_measure": "rank-biserial r",
+      "effect_size": 0.497,
+      "p_holm": 9.35e-17,
+      "direction": "higher with disease"
+    },
+    {
+      "feature": "exang",
+      "test": "Chi-square",
+      "effect_measure": "Cramer's V",
+      "effect_size": 0.464,
+      "p_holm": 2.95e-41,
+      "direction": "'Yes' has highest disease rate (83.7%)"
+    },
+    {
+      "feature": "thalach",
+      "test": "Mann-Whitney U",
+      "effect_measure": "rank-biserial r",
+      "effect_size": -0.463,
+      "p_holm": 9.36e-31,
+      "direction": "lower with disease"
+    }
+  ],
+  "not_significant_after_holm": [],
+  "spearman_with_target": {
+    "ca": 0.484,
+    "exang": 0.464,
+    "oldpeak": 0.401,
+    "thalach": -0.399,
+    "slope": 0.353,
+    "sex": 0.307,
+    "age": 0.291,
+    "fbs": 0.143,
+    "chol": 0.127,
+    "trestbps": 0.11
+  },
+  "spearman_pairwise_n": {
+    "age": 920,
+    "sex": 920,
+    "trestbps": 860,
+    "chol": 718,
+    "fbs": 830,
+    "thalach": 865,
+    "exang": 865,
+    "oldpeak": 858,
+    "slope": 611,
+    "ca": 309
+  },
+  "site_heterogeneity": [
+    {
+      "feature": "age",
+      "test": "Kruskal-Wallis",
+      "sites_with_data": 4,
+      "statistic": 202.1,
+      "p_value": 1.5e-43,
+      "epsilon_squared": 0.22,
+      "median_Cleveland": 56.0,
+      "median_Hungary": 49.0,
+      "median_Switzerland": 56.0,
+      "median_Long Beach VA": 60.0,
+      "cramers_v": null
+    },
+    {
+      "feature": "trestbps",
+      "test": "Kruskal-Wallis",
+      "sites_with_data": 4,
+      "statistic": 5.4,
+      "p_value": 0.146,
+      "epsilon_squared": 0.006,
+      "median_Cleveland": 130.0,
+      "median_Hungary": 130.0,
+      "median_Switzerland": 125.0,
+      "median_Long Beach VA": 130.0,
+      "cramers_v": null
+    },
+    {
+      "feature": "chol",
+      "test": "Kruskal-Wallis",
+      "sites_with_data": 3,
+      "statistic": 2.7,
+      "p_value": 0.265,
+      "epsilon_squared": 0.004,
+      "median_Cleveland": 241.0,
+      "median_Hungary": 243.0,
+      "median_Switzerland": null,
+      "median_Long Beach VA": 228.0,
+      "cramers_v": null
+    },
+    {
+      "feature": "thalach",
+      "test": "Kruskal-Wallis",
+      "sites_with_data": 4,
+      "statistic": 161.7,
+      "p_value": 7.88e-35,
+      "epsilon_squared": 0.187,
+      "median_Cleveland": 153.0,
+      "median_Hungary": 140.0,
+      "median_Switzerland": 121.0,
+      "median_Long Beach VA": 120.0,
+      "cramers_v": null
+    },
+    {
+      "feature": "oldpeak",
+      "test": "Kruskal-Wallis",
+      "sites_with_data": 4,
+      "statistic": 67.1,
+      "p_value": 1.76e-14,
+      "epsilon_squared": 0.078,
+      "median_Cleveland": 0.8,
+      "median_Hungary": 0.0,
+      "median_Switzerland": 0.3,
+      "median_Long Beach VA": 1.5,
+      "cramers_v": null
+    },
+    {
+      "feature": "target",
+      "test": "Chi-square (site x target)",
+      "sites_with_data": 4,
+      "statistic": 157.4,
+      "p_value": 6.73e-34,
+      "epsilon_squared": null,
+      "median_Cleveland": null,
+      "median_Hungary": null,
+      "median_Switzerland": null,
+      "median_Long Beach VA": null,
+      "cramers_v": 0.414
+    }
+  ],
+  "split": {
+    "Train": {
+      "Patients": 736,
+      "Disease": 407,
+      "Prevalence (%)": 55.3,
+      "Cleveland": 242,
+      "Hungary": 236,
+      "Switzerland": 98,
+      "Long Beach VA": 160
+    },
+    "Test": {
+      "Patients": 184,
+      "Disease": 102,
+      "Prevalence (%)": 55.4,
+      "Cleveland": 61,
+      "Hungary": 58,
+      "Switzerland": 25,
+      "Long Beach VA": 40
+    }
+  },
+  "preprocessing": [
+    {
+      "strategy": "indicator",
+      "include_site": false,
+      "description": "Median/mode imputation + missing-value indicators, missing category kept for categorical features (default)",
+      "input_features": 13,
+      "n_rows": 736,
+      "n_columns": 30,
+      "n_missing_after": 0,
+      "missing_indicators": [
+        "missingindicator_trestbps",
+        "missingindicator_chol",
+        "missingindicator_thalach",
+        "missingindicator_oldpeak",
+        "missingindicator_ca"
+      ],
+      "missing_level_dummies": [
+        "restecg_-1.0",
+        "slope_-1.0",
+        "thal_-1.0"
+      ],
+      "one_hot_dummies": [
+        "cp_1.0",
+        "cp_2.0",
+        "cp_3.0",
+        "cp_4.0",
+        "restecg_0.0",
+        "restecg_1.0",
+        "restecg_2.0",
+        "slope_1.0",
+        "slope_2.0",
+        "slope_3.0",
+        "thal_3.0",
+        "thal_6.0",
+        "thal_7.0"
+      ],
+      "site_dummies": [],
+      "n_output_columns": 30
+    },
+    {
+      "strategy": "indicator",
+      "include_site": true,
+      "description": "Median/mode imputation + missing-value indicators, missing category kept for categorical features (default)",
+      "input_features": 13,
+      "n_rows": 736,
+      "n_columns": 34,
+      "n_missing_after": 0,
+      "missing_indicators": [
+        "missingindicator_trestbps",
+        "missingindicator_chol",
+        "missingindicator_thalach",
+        "missingindicator_oldpeak",
+        "missingindicator_ca"
+      ],
+      "missing_level_dummies": [
+        "restecg_-1.0",
+        "slope_-1.0",
+        "thal_-1.0"
+      ],
+      "one_hot_dummies": [
+        "cp_1.0",
+        "cp_2.0",
+        "cp_3.0",
+        "cp_4.0",
+        "restecg_0.0",
+        "restecg_1.0",
+        "restecg_2.0",
+        "slope_1.0",
+        "slope_2.0",
+        "slope_3.0",
+        "thal_3.0",
+        "thal_6.0",
+        "thal_7.0"
+      ],
+      "site_dummies": [
+        "site_Cleveland",
+        "site_Hungary",
+        "site_Long Beach VA",
+        "site_Switzerland"
+      ],
+      "n_output_columns": 34
+    },
+    {
+      "strategy": "simple",
+      "include_site": false,
+      "description": "Median/mode imputation only (no missingness information)",
+      "input_features": 13,
+      "n_rows": 736,
+      "n_columns": 22,
+      "n_missing_after": 0,
+      "missing_indicators": [],
+      "missing_level_dummies": [],
+      "one_hot_dummies": [
+        "cp_1.0",
+        "cp_2.0",
+        "cp_3.0",
+        "cp_4.0",
+        "restecg_0.0",
+        "restecg_1.0",
+        "restecg_2.0",
+        "slope_1.0",
+        "slope_2.0",
+        "slope_3.0",
+        "thal_3.0",
+        "thal_6.0",
+        "thal_7.0"
+      ],
+      "site_dummies": [],
+      "n_output_columns": 22
+    },
+    {
+      "strategy": "simple",
+      "include_site": true,
+      "description": "Median/mode imputation only (no missingness information)",
+      "input_features": 13,
+      "n_rows": 736,
+      "n_columns": 26,
+      "n_missing_after": 0,
+      "missing_indicators": [],
+      "missing_level_dummies": [],
+      "one_hot_dummies": [
+        "cp_1.0",
+        "cp_2.0",
+        "cp_3.0",
+        "cp_4.0",
+        "restecg_0.0",
+        "restecg_1.0",
+        "restecg_2.0",
+        "slope_1.0",
+        "slope_2.0",
+        "slope_3.0",
+        "thal_3.0",
+        "thal_6.0",
+        "thal_7.0"
+      ],
+      "site_dummies": [
+        "site_Cleveland",
+        "site_Hungary",
+        "site_Long Beach VA",
+        "site_Switzerland"
+      ],
+      "n_output_columns": 26
+    },
+    {
+      "strategy": "drop_sparse",
+      "include_site": false,
+      "description": "Drop ca, slope, thal (>30% missing), median/mode impute the rest",
+      "input_features": 13,
+      "n_rows": 736,
+      "n_columns": 15,
+      "n_missing_after": 0,
+      "missing_indicators": [],
+      "missing_level_dummies": [],
+      "one_hot_dummies": [
+        "cp_1.0",
+        "cp_2.0",
+        "cp_3.0",
+        "cp_4.0",
+        "restecg_0.0",
+        "restecg_1.0",
+        "restecg_2.0"
+      ],
+      "site_dummies": [],
+      "n_output_columns": 15
+    },
+    {
+      "strategy": "drop_sparse",
+      "include_site": true,
+      "description": "Drop ca, slope, thal (>30% missing), median/mode impute the rest",
+      "input_features": 13,
+      "n_rows": 736,
+      "n_columns": 19,
+      "n_missing_after": 0,
+      "missing_indicators": [],
+      "missing_level_dummies": [],
+      "one_hot_dummies": [
+        "cp_1.0",
+        "cp_2.0",
+        "cp_3.0",
+        "cp_4.0",
+        "restecg_0.0",
+        "restecg_1.0",
+        "restecg_2.0"
+      ],
+      "site_dummies": [
+        "site_Cleveland",
+        "site_Hungary",
+        "site_Long Beach VA",
+        "site_Switzerland"
+      ],
+      "n_output_columns": 19
+    }
+  ],
+  "pca": {
+    "n_train_rows": 736,
+    "n_columns": 30,
+    "explained_variance_pct": [
+      22.5,
+      14.4,
+      13.8,
+      7.6,
+      6.8
+    ],
+    "pc1_pc2_cumulative_pct": 36.9,
+    "components_for_80pct": 8,
+    "components_for_90pct": 13,
+    "silhouette_2d_by_site": 0.008,
+    "silhouette_2d_by_target": 0.079,
+    "top_loadings": {
+      "PC1": [
+        {
+          "column": "missingindicator_thalach",
+          "readable": "Max heart rate: missing",
+          "loading": 0.526
+        },
+        {
+          "column": "missingindicator_trestbps",
+          "readable": "Resting BP: missing",
+          "loading": 0.523
+        },
+        {
+          "column": "missingindicator_oldpeak",
+          "readable": "ST depression: missing",
+          "loading": 0.52
+        },
+        {
+          "column": "missingindicator_ca",
+          "readable": "Major vessels: missing",
+          "loading": 0.255
+        },
+        {
+          "column": "ca",
+          "readable": "Major vessels",
+          "loading": -0.167
+        },
+        {
+          "column": "slope_-1.0",
+          "readable": "ST slope: missing",
+          "loading": 0.135
+        }
+      ],
+      "PC2": [
+        {
+          "column": "age",
+          "readable": "Age",
+          "loading": 0.503
+        },
+        {
+          "column": "oldpeak",
+          "readable": "ST depression",
+          "loading": 0.422
+        },
+        {
+          "column": "ca",
+          "readable": "Major vessels",
+          "loading": 0.416
+        },
+        {
+          "column": "missingindicator_ca",
+          "readable": "Major vessels: missing",
+          "loading": -0.297
+        },
+        {
+          "column": "trestbps",
+          "readable": "Resting BP",
+          "loading": 0.249
+        },
+        {
+          "column": "thalach",
+          "readable": "Max heart rate",
+          "loading": -0.209
+        }
+      ]
+    },
+    "simple_strategy_explained_variance_pct": [
+      22.7,
+      13.6
+    ],
+    "no_exercise_test_block": {
+      "n": 44,
+      "sites": {
+        "Long Beach VA": 44
+      },
+      "disease_rate_pct": 63.6,
+      "mean_pc1": 6.55,
+      "mean_pc1_other_rows": -0.42
+    }
+  },
+  "notes": [
+    "Descriptive statistics and tests use all 920 patients; no modelling decision is based on them.",
+    "PCA uses the training split only (preprocessor fitted on train).",
+    "Chi-square tests are Pearson (no continuity correction); missing values excluded per test.",
+    "chol == 0 and trestbps == 0 in the raw files were recoded as missing before all analyses."
+  ],
+  "figures": [
+    "eda_class_balance.png",
+    "eda_missingness.png",
+    "eda_numeric_distributions.png",
+    "eda_categorical_rates.png",
+    "eda_correlation.png",
+    "eda_site_differences.png",
+    "eda_pca.png"
+  ]
+}
